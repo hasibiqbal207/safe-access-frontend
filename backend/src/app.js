@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import fileUpload from "express-fileupload";
 import cors from "cors";
+import createHttpError from "http-errors";
+import routes from "./routes/index.js";
 
 const app = express();
 
@@ -14,8 +16,10 @@ if(process.env.NODE_ENV !== "production")  {
     app.use(morgan("dev"));
 }
 
+
+
 //Helmet
-app-use(helmet());
+app.use(helmet());
 
 // Parse JSON request url
 app.use(express.json());
@@ -39,6 +43,28 @@ app.use(fileUpload({
 
 // Enable cors
 app.use(cors());
+
+app.post("/test", (req, res) => {
+    console.log(req.body);
+    res.send(req.body);
+})
+
+
+// Api v1 routes
+app.use("/api/v1", routes)
+
+app.use(async(req, res, next) => {
+    next(createHttpError.NotFound("This route does not exist"));
+})
+
+//error handling
+app.use(async(error, req, res, next) => {
+    res.status(error.status || 500);
+    res.send({
+        status: error.status || 500,
+        message: error.message,
+    })
+})
 
 
 export default app;
