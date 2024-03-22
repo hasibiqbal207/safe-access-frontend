@@ -49,3 +49,20 @@ export const createUser = async (userData) => {
 
     return user;
 }
+
+export const signUser = async (email, password) => {
+    const user = await UserModel.findOne({ email: email.toLowerCase() }).lean();
+    
+    // Check if user exists
+    if(!user) {
+        throw createHttpError.NotFound("User not found");
+    }
+
+    // Check password
+    let passwordMatch = await bcrypt.compare(password, user.password);
+    if(!passwordMatch) {
+        throw createHttpError.NotFound("Invalid credentials");
+    }
+
+    return user;
+}
