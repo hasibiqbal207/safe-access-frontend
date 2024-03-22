@@ -4,3 +4,6 @@ export const generateToken = async (payload, expiresIn, secret) => {
     return token;
 }
 
+export const verifyToken = async (token, secret) => {
+
+}
