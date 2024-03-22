@@ -37,6 +37,8 @@ export const createUser = async (userData) => {
         throw createHttpError.BadRequest("Password must be between 6 and 64 characters");
     }
 
+    //
+
     const user = await new UserModel({
         name,
         email,
