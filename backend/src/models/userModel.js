@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema({
     collection: "users",
     timestamps: true,
 })
+
 userSchema.pre("save", async function(next) {
     try {
         if(this.isNew) {
