@@ -1,12 +1,13 @@
 import { useRef, useState } from "react";
 
-export default function Picture({
+const Picture = ({
   readablePicture,
   setReadablePicture,
   setPicture,
-}) {
+}) => {
   const [error, setError] = useState("");
   const inputRef = useRef();
+
   const hanldePicture = (e) => {
     let pic = e.target.files[0];
     if (
@@ -30,10 +31,12 @@ export default function Picture({
       };
     }
   };
+
   const handleChangePic = () => {
     setPicture("");
     setReadablePicture("");
   };
+
   return (
     <div className="mt-8 content-center dark:text-dark_text_1 space-y-1">
       <label htmlFor="picture" className="text-sm font-bold tracking-wide">
@@ -43,7 +46,7 @@ export default function Picture({
         <div>
           <img
             src={readablePicture}
-            alt="picture"
+            alt="Profile picture"
             className="w-20 h-20 object-cover rounded-full"
           />
           {/* change pic */}
@@ -79,3 +82,5 @@ export default function Picture({
     </div>
   );
 }
+
+export default Picture

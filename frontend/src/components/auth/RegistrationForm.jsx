@@ -1,22 +1,27 @@
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signUpSchema } from "../../utils/validation";
-import AuthInput from "./AuthInput";
-import { useDispatch, useSelector } from "react-redux";
-import PulseLoader from "react-spinners/PulseLoader";
+
 import { Link, useNavigate } from "react-router-dom";
 import { changeStatus, registerUser } from "../../features/userSlice";
-import { useState } from "react";
+import PulseLoader from "react-spinners/PulseLoader";
+import AuthInput from './AuthInput'
 import Picture from "./Picture";
-import axios from "axios";
-const cloud_name = process.env.REACT_APP_CLOUD_NAME;
-const cloud_secret = process.env.REACT_APP_CLOUD_SECRET;
-export default function RegisterForm() {
+
+const cloud_name = import.meta.env.VITE_REACT_APP_CLOUD_NAME;
+const cloud_secret = import.meta.env.VITE_REACT_APP_CLOUD_SECRET;
+
+const RegistrationForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.user);
   const [picture, setPicture] = useState();
   const [readablePicture, setReadablePicture] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -25,6 +30,7 @@ export default function RegisterForm() {
   } = useForm({
     resolver: yupResolver(signUpSchema),
   });
+
   const onSubmit = async (data) => {
     dispatch(changeStatus("loading"));
     if (picture) {
@@ -44,6 +50,7 @@ export default function RegisterForm() {
       }
     }
   };
+
   const uploadImage = async () => {
     let formData = new FormData();
     formData.append("upload_preset", cloud_secret);
@@ -54,6 +61,7 @@ export default function RegisterForm() {
     );
     return data;
   };
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
       {/* Container */}
@@ -63,6 +71,7 @@ export default function RegisterForm() {
           <h2 className="mt-6 text-3xl font-bold">Welcome</h2>
           <p className="mt-2 text-sm">Sign up</p>
         </div>
+
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
           <AuthInput
@@ -72,6 +81,7 @@ export default function RegisterForm() {
             register={register}
             error={errors?.name?.message}
           />
+
           <AuthInput
             name="email"
             type="text"
@@ -79,6 +89,7 @@ export default function RegisterForm() {
             register={register}
             error={errors?.email?.message}
           />
+
           <AuthInput
             name="status"
             type="text"
@@ -86,6 +97,7 @@ export default function RegisterForm() {
             register={register}
             error={errors?.status?.message}
           />
+
           <AuthInput
             name="password"
             type="password"
@@ -93,18 +105,21 @@ export default function RegisterForm() {
             register={register}
             error={errors?.password?.message}
           />
+
           {/* Picture */}
           <Picture
             readablePicture={readablePicture}
             setReadablePicture={setReadablePicture}
             setPicture={setPicture}
           />
+
           {/*if we have an error*/}
           {error ? (
             <div>
               <p className="text-red-400">{error}</p>
             </div>
           ) : null}
+
           {/*Submit button*/}
           <button
             className="w-full flex justify-center bg-green_1 text-gray-100 p-4 rounded-full tracking-wide
@@ -118,6 +133,7 @@ export default function RegisterForm() {
               "Sign up"
             )}
           </button>
+
           {/* Sign in link */}
           <p className="flex flex-col items-center justify-center mt-10 text-center text-md dark:text-dark_text_1">
             <span>have an account ?</span>
@@ -129,7 +145,9 @@ export default function RegisterForm() {
             </Link>
           </p>
         </form>
-      </div>
-    </div>
-  );
+      </ div>
+    </div>    
+  )
 }
+
+export default RegistrationForm

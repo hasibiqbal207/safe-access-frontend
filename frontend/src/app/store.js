@@ -1,29 +1,33 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import userSlice from "../features/userSlice";
-import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
+import createFilter from "redux-persist-transform-filter";
+import storage from "redux-persist/lib/storage";
+//slices
+import userSlice from "../features/userSlice";
 
-//save only user data filter
-const saveUserOnlyfilter = createFilter("user", ["user"]);
+//saveUserOnlyFilter
+const saveUserOnlyFilter = createFilter("user", ["user"]);
 
-// Persist Config
+//persist config
 const persistConfig = {
-    key: "user",
-    storage,
-    whitelist: ["user"],
-    transforms: [saveUserOnlyfilter],
-}
+  key: "user",
+  storage,
+  whitelist: ["user"],
+  transforms: [saveUserOnlyFilter],
+};
 
 const rootReducer = combineReducers({
-    user: userSlice
-})
-
-const persistedReducer = persistReducer(persistConfig, rootReducer); 
+  user: userSlice,
+});
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-    reducer: rootReducer,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
-    devTools: true,
-})
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+  devTools: true,
+});
 
-export const persistor = persistStore(store)
+export const persistor = persistStore(store);
