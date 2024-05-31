@@ -11,6 +11,8 @@ import Registration from "./pages/Registration";
 
 
 function App() {
+  const {user} = useSelector((state) => state.user);
+  const {token} = user; 
 
   return (
     <div className="dark">
@@ -19,17 +21,17 @@ function App() {
             <Route
               exact
               path="/"
-              element={<Home /> }              
+              element={token ? <Home /> : <Navigate to="/login" />}              
             />
             <Route
               exact
               path="/login"
-              element={<Login />}
+              element={!token ? <Login /> : <Navigate to="/" />}
             />
             <Route
               exact
               path="/registration"
-              element={<Registration />}
+              element={!token ? <Registration /> : <Navigate to="/" />}
             />
           </Routes>
         </Router>
