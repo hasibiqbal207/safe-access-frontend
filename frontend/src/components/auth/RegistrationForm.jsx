@@ -15,6 +15,11 @@ import Picture from "./Picture";
 const cloud_name = import.meta.env.VITE_REACT_APP_CLOUD_NAME;
 const cloud_secret = import.meta.env.VITE_REACT_APP_CLOUD_SECRET;
 
+/**
+ * RegistrationForm component is responsible for rendering a form for user registration.
+ *
+ * @return {JSX.Element} The JSX element representing the RegistrationForm component.
+ */
 const RegistrationForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -22,15 +27,24 @@ const RegistrationForm = () => {
   const [picture, setPicture] = useState();
   const [readablePicture, setReadablePicture] = useState("");
 
+  // useForm is a custom hook from react-hook-form for managing form state and validation
   const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
+    register, // Function to register inputs into the form
+    handleSubmit, // Function to handle form submission
+    formState: { errors }, // Object containing form validation errors
   } = useForm({
-    resolver: yupResolver(signUpSchema),
+    // resolver integrates external validation schema (Yup) with react-hook-form
+    resolver: yupResolver(signUpSchema), // yupResolver is used to validate the form using the Yup schema (signUpSchema)
   });
-
+  
+  /**
+   * Submits the form data to register a user. If a picture is provided, it uploads the picture to Cloudinary and then 
+   * registers the user with the provided data and the secure URL of the uploaded picture. If no picture is provided, 
+   * it registers the user with an empty string for the picture.
+   *
+   * @param {Object} data - The form data to be submitted.
+   * @return {Promise<void>} - A promise that resolves when the user is successfully registered and navigated to the home page.
+   */
   const onSubmit = async (data) => {
     dispatch(changeStatus("loading"));
     if (picture) {

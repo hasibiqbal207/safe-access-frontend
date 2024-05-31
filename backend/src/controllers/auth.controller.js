@@ -3,6 +3,14 @@ import { createUser, signUser } from "../services/auth.service.js";
 import { generateToken, verifyToken } from "../services/token.service.js";
 import { findUser } from "../services/user.service.js";
 
+/**
+ * Registers a new user with the provided information.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ * @return {Promise<void>} - A promise that resolves when the user is successfully registered.
+ */
 export const register = async (req, res, next) => {
   try {
     const { name, email, picture, status, password } = req.body;
@@ -31,7 +39,7 @@ export const register = async (req, res, next) => {
     });
 
     res.json({
-      message: "register success.",
+      message: "registration successful.",
       user: {
         _id: newUser._id,
         name: newUser.name,
@@ -45,6 +53,18 @@ export const register = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Logs in a user with the provided email and password.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.body - The request body object.
+ * @param {string} req.body.email - The email of the user.
+ * @param {string} req.body.password - The password of the user.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ * @return {Promise<void>} - A promise that resolves when the user is successfully logged in.
+ */
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -81,6 +101,15 @@ export const login = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Logs out the user by clearing the refresh token cookie and sending a JSON response.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ * @return {Promise<void>} A promise that resolves when the logout process is complete.
+ */
 export const logout = async (req, res, next) => {
   try {
     res.clearCookie("refreshtoken", { path: "/api/v1/auth/refreshtoken" });
@@ -91,6 +120,16 @@ export const logout = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Refreshes the access token using the refresh token stored in the cookies.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ * @return {Promise<void>} A promise that resolves when the access token is refreshed and sent in the response.
+ * @throws {createHttpError.Unauthorized} If the refresh token is not found in the cookies.
+ */
 export const refreshToken = async (req, res, next) => {
   try {
     const refresh_token = req.cookies.refreshtoken;

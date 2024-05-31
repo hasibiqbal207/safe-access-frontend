@@ -19,19 +19,21 @@ export default function LoginForm() {
   */
   const { status, error } = useSelector((state) => state.user); 
 
+
+  // useForm is a custom hook from react-hook-form for managing form state and validation
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
+    register, // Function to register inputs into the form
+    handleSubmit, // Function to handle form submission
+    formState: { errors }, // Object containing form validation errors
   } = useForm({
-    resolver: yupResolver(signInSchema),
-  })
+    // resolver integrates external validation schema (Yup) with react-hook-form
+    resolver: yupResolver(signInSchema), // yupResolver is used to validate the form using the Yup schema (signInSchema)
+  });
+
 
   // Method that describes what to do on submit
   const onSubmit = async (values) => {
-    console.log("Test");
     let res = await dispatch(loginUser({ ...values }));
-    console.log(res);
     if (res?.payload?.user) {
       navigate("/");
     }

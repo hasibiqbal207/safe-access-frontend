@@ -1,5 +1,16 @@
 import React from 'react'
 
+/**
+ * Renders a custom input field with a label and error message.
+ *
+ * @param {Object} props - The props object containing the following properties:
+ *   - name {string} - The name of the input field.
+ *   - type {string} - The type of the input field.
+ *   - placeholder {string} - The placeholder text for the input field.
+ *   - register {function} - The register function from the useForm hook.
+ *   - error {string} - The error message to display if there is an error.
+ * @return {JSX.Element} The rendered input field component.
+ */
 const AuthInput = ({
   name,
   type,

@@ -1,5 +1,14 @@
 import { useRef, useState } from "react";
 
+/**
+ * Renders a component for uploading and displaying a picture.
+ *
+ * @param {Object} props - The component props.
+ * @param {string} props.readablePicture - The URL of the readable picture.
+ * @param {function} props.setReadablePicture - The function to set the readable picture.
+ * @param {function} props.setPicture - The function to set the picture.
+ * @return {JSX.Element} The rendered component.
+ */
 const Picture = ({
   readablePicture,
   setReadablePicture,
@@ -8,6 +17,12 @@ const Picture = ({
   const [error, setError] = useState("");
   const inputRef = useRef();
 
+  /**
+   * Handles the picture upload event after making necessary validations.
+   *
+   * @param {Event} e - The event object containing the uploaded picture.
+   * @return {void} This function does not return anything.
+   */
   const hanldePicture = (e) => {
     let pic = e.target.files[0];
     if (
@@ -32,6 +47,11 @@ const Picture = ({
     }
   };
 
+/**
+ * Resets the picture and readable picture state variables.
+ *
+ * @return {void} No return value.
+ */
   const handleChangePic = () => {
     setPicture("");
     setReadablePicture("");
@@ -49,6 +69,7 @@ const Picture = ({
             alt="Profile picture"
             className="w-20 h-20 object-cover rounded-full"
           />
+
           {/* change pic */}
           <div
             className="mt-2 w-20 py-1 dark:bg-dark_bg_3 rounded-md text-xs font-bold flex items-center justify-center cursor-pointer"
@@ -75,6 +96,7 @@ const Picture = ({
         accept="image/png,image/jpeg,image/webp"
         onChange={hanldePicture}
       />
+
       {/*error*/}
       <div className="mt-2">
         <p className="text-red-400">{error}</p>

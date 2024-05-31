@@ -8,6 +8,7 @@ import {
 } from "../controllers/auth.controller.js";
 const router = express.Router();
 
+// Api routes
 router.route("/register").post(trimRequest.all, register);
 router.route("/login").post(trimRequest.all, login);
 router.route("/logout").post(trimRequest.all, logout);

@@ -6,6 +6,23 @@ import { UserModel } from "../models/index.js";
 //env variables
 const { DEFAULT_PICTURE, DEFAULT_STATUS } = process.env;
 
+/**
+ * Creates a new user in the database with the provided user data.
+ *
+ * @param {Object} userData - The user data to create a new user.
+ * @param {string} userData.name - The name of the user.
+ * @param {string} userData.email - The email of the user.
+ * @param {string} [userData.picture] - The picture of the user.
+ * @param {string} [userData.status] - The status of the user.
+ * @param {string} userData.password - The password of the user.
+ * @throws {BadRequest} If any of the required fields are empty.
+ * @throws {BadRequest} If the name is not between 2 and 16 characters.
+ * @throws {BadRequest} If the status is longer than 64 characters.
+ * @throws {BadRequest} If the email is not a valid email address.
+ * @throws {Conflict} If a user with the same email already exists.
+ * @throws {BadRequest} If the password is not between 6 and 128 characters.
+ * @return {Promise<Object>} The newly created user object.
+ */
 export const createUser = async (userData) => {
   const { name, email, picture, status, password } = userData;
 
@@ -74,6 +91,15 @@ export const createUser = async (userData) => {
   return user;
 };
 
+/**
+ * Signs in a user with the provided email and password.
+ *
+ * @param {string} email - The email of the user.
+ * @param {string} password - The password of the user.
+ * @return {Promise<Object>} - A promise that resolves to the user object if the credentials are valid,
+ *                            or throws an error if the credentials are invalid.
+ * @throws {NotFound} - If the user with the provided email does not exist or the passwords do not match.
+ */
 export const signUser = async (email, password) => {
   const user = await UserModel.findOne({ email: email.toLowerCase() }).lean();
 

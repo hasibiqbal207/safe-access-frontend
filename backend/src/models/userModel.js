@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
     timestamps: true,
 })
 
+// hash password
 userSchema.pre("save", async function(next) {
     try {
         if(this.isNew) {
