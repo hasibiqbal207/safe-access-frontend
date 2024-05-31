@@ -1,7 +1,10 @@
+import { useSelector } from "react-redux";
+
 import {
   BrowserRouter as Router,
   Routes,
-  Route
+  Route,
+  Navigate
 } from "react-router-dom";
 
 //Pages
