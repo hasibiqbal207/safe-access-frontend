@@ -1,0 +1,414 @@
+paths:
+  /auth/register:
+    post:
+      tags:
+      - Authentication
+      summary: Register a new user
+      description: Create a new user account with the provided details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - firstName
+              - lastName
+              - email
+              - password
+              properties:
+                firstName:
+                  type: string
+                  example: John
+                  minLength: 2
+                  maxLength: 50
+                lastName:
+                  type: string
+                  example: Doe
+                  minLength: 2
+                  maxLength: 50
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  format: password
+                  example: StrongP@ss123
+                  minLength: 8
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Registration successful. Please check your email for verification.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 60d0fe4f5311236168a109ca
+                      email:
+                        type: string
+                        format: email
+                        example: john.doe@example.com
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../errors/response.code.yaml#/definitions/ValidationError'
+
+  /auth/verify-email:
+    post:
+      tags:
+      - Authentication
+      summary: Verify email address
+      description: Verify a user's email address using the verification token sent to their email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - verification_token
+              properties:
+                verification_token:
+                  type: string
+                  example: 7f5d7c6a5b4a3c2d1e0f9e8d7c6b5a4
+      responses:
+        '200':
+          description: Email verification successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Email verification successful. You can now log in.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Invalid or expired verification token
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: INVALID_TOKEN
+
+  /auth/resend-verification:
+    post:
+      tags:
+      - Authentication
+      summary: Resend verification email
+      description: Resend the email verification link to the user's email address
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Verification email sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Verification email has been resent. Please check your inbox.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Email is already verified
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: EMAIL_ALREADY_VERIFIED
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '../errors/response.code.yaml#/definitions/UnauthorizedError'
+
+  /auth/login:
+    post:
+      tags:
+      - Authentication
+      summary: Login to an existing account
+      description: Authenticate a user with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  format: password
+                  example: StrongP@ss123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Login successful
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: 60d0fe4f5311236168a109ca
+                          firstName:
+                            type: string
+                            example: John
+                          lastName:
+                            type: string
+                            example: Doe
+                          email:
+                            type: string
+                            format: email
+                            example: john.doe@example.com
+                          emailVerified:
+                            type: boolean
+                            example: true
+                          is2FAEnabled:
+                            type: boolean
+                            example: false
+                          role:
+                            type: string
+                            example: user
+                      accessToken:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      refreshToken:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      requires2FA:
+                        type: boolean
+                        example: false
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '../errors/response.code.yaml#/definitions/UnauthorizedError'
+
+  /auth/refresh:
+    post:
+      tags:
+      - Authentication
+      summary: Refresh access token
+      description: Get a new access token using a valid refresh token
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Token refreshed successfully
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: 60d0fe4f5311236168a109ca
+                          firstName:
+                            type: string
+                            example: John
+                          lastName:
+                            type: string
+                            example: Doe
+                          email:
+                            type: string
+                            format: email
+                            example: john.doe@example.com
+                          emailVerified:
+                            type: boolean
+                            example: true
+                          is2FAEnabled:
+                            type: boolean
+                            example: false
+                          role:
+                            type: string
+                            example: user
+                      accessToken:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      refreshToken:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '../errors/response.code.yaml#/definitions/UnauthorizedError'
+
+  /auth/logout:
+    post:
+      tags:
+      - Authentication
+      summary: Logout from current session
+      description: End the current user session
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        '200':
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Logged out successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '../errors/response.code.yaml#/definitions/UnauthorizedError'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../errors/response.code.yaml#/definitions/ValidationError'
+
+  /auth/logout/all:
+    post:
+      tags:
+      - Authentication
+      summary: Logout from all sessions
+      description: End all user sessions across all devices
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Logged out of all sessions successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Logged out of all sessions successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '../errors/response.code.yaml#/definitions/UnauthorizedError'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '../errors/response.code.yaml#/definitions/ValidationError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

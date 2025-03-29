@@ -1,0 +1,17 @@
+{
+  "extends": "@tsconfig/node18/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./", // The root directory of your TypeScript files
+    "outDir": "./dist", // Output directory for the compiled JavaScript files
+    "forceConsistentCasingInFileNames": true, // Ensure file names are treated as case-sensitive
+    "allowSyntheticDefaultImports": true,
+  },
+  "include": [
+    "src/**/*.ts",
+    "config/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules", 
+    "dist"
+  ],
+}

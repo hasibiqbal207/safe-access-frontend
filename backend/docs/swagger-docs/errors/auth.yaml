@@ -1,0 +1,20 @@
+components:
+  schemas:
+    UnauthorizedError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Unauthorized - Invalid or missing token
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: UNAUTHORIZED
+            details:
+              type: string
+              example: Please provide a valid authentication token

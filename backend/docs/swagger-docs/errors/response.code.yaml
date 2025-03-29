@@ -1,0 +1,136 @@
+definitions:
+  SuccessResponse:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 200
+      success:
+        type: boolean
+        example: true
+      message:
+        type: string
+        example: "Operation completed successfully."
+      data:
+        type: object
+        additionalProperties: true
+
+  UnauthorizedError:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 401
+      success:
+        type: boolean
+        example: false
+      message:
+        type: string
+        example: "Unauthorized access. Please provide valid credentials."
+      errorCode:
+        type: string
+        example: "UNAUTHORIZED"
+
+  NotFoundError:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 404
+      success:
+        type: boolean
+        example: false
+      message:
+        type: string
+        example: "Resource not found."
+      errorCode:
+        type: string
+        example: "NOT_FOUND"
+
+  ValidationError:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 400
+      success:
+        type: boolean
+        example: false
+      message:
+        type: string
+        example: "Validation failed for the provided input."
+      errors:
+        type: array
+        items:
+          type: object
+          properties:
+            field:
+              type: string
+              example: "username"
+            message:
+              type: string
+              example: "Username is required."
+
+  DatabaseError:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 500
+      success:
+        type: boolean
+        example: false
+      message:
+        type: string
+        example: "An error occurred while interacting with the database."
+      errorCode:
+        type: string
+        example: "DATABASE_ERROR"
+
+  ForbiddenError:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 403
+      success:
+        type: boolean
+        example: false
+      message:
+        type: string
+        example: "You do not have permission to perform this action."
+      errorCode:
+        type: string
+        example: "FORBIDDEN"
+
+  ConflictError:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 409
+      success:
+        type: boolean
+        example: false
+      message:
+        type: string
+        example: "Conflict occurred. The resource already exists."
+      errorCode:
+        type: string
+        example: "CONFLICT"
+
+  InternalServerError:
+    type: object
+    properties:
+      status:
+        type: integer
+        example: 500
+      success:
+        type: boolean
+        example: false
+      message:
+        type: string
+        example: "An unexpected error occurred."
+      errorCode:
+        type: string
+        example: "INTERNAL_SERVER_ERROR"

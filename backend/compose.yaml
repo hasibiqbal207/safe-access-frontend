@@ -1,0 +1,46 @@
+services:
+  development:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    image: # Name of the image
+    ports:
+      - "6002:6002"
+    volumes:
+      - ./:/app
+      - /app/node_modules/
+
+  production:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+    image: # Name of the image
+    ports:
+      - "6002:6002"
+    restart: always
+
+  test:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.stage
+      target: test
+    image: # Name of the image
+    volumes:
+      - ./:/app
+
+  staging-only:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.stage
+      target: staging
+    image: # Name of the image
+    ports:
+      - "6002:6002"
+
+  staging:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.stage
+    image: # Name of the image
+    ports:
+      - "6002:6002"

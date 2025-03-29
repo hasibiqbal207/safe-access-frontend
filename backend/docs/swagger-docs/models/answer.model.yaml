@@ -1,0 +1,33 @@
+definitions:
+  answers:
+    type: object
+    required:
+    - groupformation
+    - user
+    - question
+    - type
+    - internalValue
+    properties:
+      _id:
+        type: string
+        format: mongodb-objectid
+      groupformation:
+        type: string
+        format: mongodb-objectid
+        ref: 'groupformations'
+      user:
+        type: string
+        format: mongodb-objectid
+        ref: 'users'
+      question:
+        type: string
+        format: mongodb-objectid
+        ref: 'questions'
+      type:
+        type: string
+        enum: [ "number", "likert", "freetext", "range", "dropdown", "multiselect", "ordered" ]
+      internalValue:
+        type: string
+      deleted:
+        type: boolean
+        default: false

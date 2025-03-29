@@ -1,0 +1,44 @@
+# Stage 1: Build the application
+FROM node:18.12.0-alpine AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json (if available)
+COPY ../package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy the rest of the application source code
+COPY ../ .
+
+# Build the application (e.g., for React or any JS framework)
+CMD ["npm", "run", "build"]
+
+# Stage 2: Run tests
+FROM node:18.12.0-alpine AS test
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy everything from the build stage (including dependencies and source)
+COPY --from=build /app /app
+
+# Run tests
+CMD ["npm", "test"]
+
+# Stage 3: Staging environment (production-like)
+FROM node:18.12.0-alpine AS staging
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy build output from the build stage
+COPY --from=build /app/dist /app/dist
+
+# Expose the port that the application will run on (example: 6002)
+EXPOSE 6002
+
+# Start the application for staging
+CMD ["npm", "run", "staging"]

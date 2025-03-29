@@ -1,0 +1,312 @@
+openapi: 3.0.0
+info:
+  title: Security Authentication API
+  description: API for managing security-related authentication operations
+  version: 1.0.0
+
+servers:
+- url: /api/auth/security
+  description: Security authentication endpoints
+
+components:
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+        message:
+          type: string
+          description: A message describing the result of the operation
+        data:
+          type: object
+          description: The response data
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code for the failed operation
+          description: Error details if the operation failed
+
+    LoginHistoryEntry:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the login history entry
+        userId:
+          type: string
+          description: ID of the user associated with this login
+        ip:
+          type: string
+          description: IP address from which the login attempt was made
+        userAgent:
+          type: string
+          description: User agent information from the login attempt
+        status:
+          type: string
+          enum: [ success, failed ]
+          description: Status of the login attempt
+        failureReason:
+          type: string
+          description: Reason for failure if the login was unsuccessful
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of the login attempt
+
+    AuditLogEntry:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the audit log entry
+        userId:
+          type: string
+          description: ID of the user associated with this activity
+        eventType:
+          type: string
+          description: Type of event that was logged
+        details:
+          type: object
+          description: Additional details about the event
+        ip:
+          type: string
+          description: IP address from which the activity originated
+        userAgent:
+          type: string
+          description: User agent information from the activity
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of the activity
+
+    PaginationInfo:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of items available
+        page:
+          type: integer
+          description: Current page number
+        pages:
+          type: integer
+          description: Total number of pages
+        limit:
+          type: integer
+          description: Number of items per page
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+- BearerAuth: []
+
+paths:
+  /login-history:
+    get:
+      summary: Get user login history
+      description: Retrieves a paginated list of login attempts for the authenticated user
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+        description: Page number for pagination
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 10
+        description: Number of results per page
+      responses:
+        '200':
+          description: Login history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Login history retrieved successfully"
+                  data:
+                    type: object
+                    properties:
+                      loginHistory:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LoginHistoryEntry'
+                      pagination:
+                        $ref: '#/components/schemas/PaginationInfo'
+        '500':
+          description: Failed to retrieve login history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to retrieve login history"
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "LOGIN_HISTORY_RETRIEVAL_FAILED"
+
+  /audit-log:
+    get:
+      summary: Get user audit log
+      description: Retrieves a paginated list of security-related activities for the authenticated user
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+        description: Page number for pagination
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 10
+        description: Number of results per page
+      responses:
+        '200':
+          description: Audit log retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Audit log retrieved successfully"
+                  data:
+                    type: object
+                    properties:
+                      auditLog:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AuditLogEntry'
+                      pagination:
+                        $ref: '#/components/schemas/PaginationInfo'
+        '500':
+          description: Failed to retrieve audit log
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Failed to retrieve audit log"
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "AUDIT_LOG_RETRIEVAL_FAILED"
+
+  /export:
+    get:
+      summary: Export security data
+      description: Exports login history and audit log data for the authenticated user
+      parameters:
+      - in: query
+        name: startDate
+        required: true
+        schema:
+          type: string
+          format: date
+        description: Start date for the data export (YYYY-MM-DD)
+      - in: query
+        name: endDate
+        required: true
+        schema:
+          type: string
+          format: date
+        description: End date for the data export (YYYY-MM-DD)
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum: [ csv, json ]
+          default: csv
+        description: Format of the exported data
+      responses:
+        '200':
+          description: |
+            Data exported successfully. 
+            For CSV format, returns a ZIP file containing login history and audit log CSV files.
+            For JSON format, returns a JSON file containing both datasets.
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+                description: ZIP file containing exported data (for CSV format)
+            application/json:
+              schema:
+                type: string
+                format: binary
+                description: JSON file containing exported data (for JSON format)
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Invalid date range"
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "INVALID_DATE_RANGE"
+        '500':
+          description: Failed to export data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Export failed"
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "EXPORT_FAILED"

@@ -1,0 +1,17 @@
+definitions:
+  clientError:
+    type: object
+    properties:
+      type:
+        type: string
+        enum: [ ClientError ]
+      message:
+        type: string
+      specificType:
+        type: string
+        enum: [ 'badRequest', 'rateLimit', 'payloadTooLarge', 'unsupportedMediaType', 'methodNotAllowed' ]
+      errorCode:
+        type: string
+      details:
+        type: object
+        additionalProperties: true
