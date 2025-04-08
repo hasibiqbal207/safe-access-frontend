@@ -12,13 +12,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/app/components/ui/form";
-import { Input } from "@/app/components/ui/input";
-import { Button } from "@/app/components/ui/button";
-// import Logo from "@/app/components/logo";
+} from "@/app/components/form";
+import { Input } from "@/app/components/input";
+import { Button } from "@/app/components/button";
 import { loginMutationFn } from "@/lib/api";
 import { useRouter } from "next/navigation";
-// import { toast } from "@/app/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 // Define response and error types
 interface LoginResponse {
@@ -67,11 +66,11 @@ export default function Login() {
         router.replace(`/home`);
       },
       onError: (error: LoginError) => {
-        // toast({
-        //   title: "Error",
-        //   description: error.message,
-        //   variant: "destructive",
-        // });
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
       },
     });
   };
@@ -79,8 +78,6 @@ export default function Login() {
   return (
     <main className="w-full min-h-[590px] h-auto max-w-full pt-10">
       <div className="w-full h-full p-5 rounded-md">
-        {/* <Logo /> */}
-
         <h1 className="text-xl tracking-[-0.16px] dark:text-[#fcfdffef] font-bold mb-1.5 mt-8 text-center sm:text-left">
           Log in to Safe Access
         </h1>
@@ -164,7 +161,7 @@ export default function Login() {
             </div>
           </form>
         </Form>
-        <Button className="w-full h-[40px]"> // variant="outline" 
+        <Button className="w-full h-[40px] variant='outline' "> 
           Email magic link
         </Button>
         <p className="text-xs dark:text-slate- font-normal mt-7">
