@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/button";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/app/components/dialog";
 import { toast } from "@/hooks/use-toast";
 import { logoutMutationFn } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";

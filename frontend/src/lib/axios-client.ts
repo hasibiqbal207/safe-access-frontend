@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const options = {
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: process.env.BACKEND_URL,
   withCredentials: true,
   timeout: 10000,
 };

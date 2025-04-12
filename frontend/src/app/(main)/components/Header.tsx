@@ -1,5 +1,5 @@
 import React from "react";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/app/components/sidebar";
 
 const Header = () => {
   return (

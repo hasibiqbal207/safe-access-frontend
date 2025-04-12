@@ -12,12 +12,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/app/components/dialog";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp";
+} from "@/app/components/input-otp";
 import {
   Form,
   FormControl,
@@ -25,14 +25,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
+} from "@/app/components/form";
+import { Button } from "@/app/components/button";
 import { useAuthContext } from "@/context/auth-provider";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { mfaSetupQueryFn, mfaType, verifyMFAMutationFn } from "@/lib/api";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/app/components/skeleton";
 import { toast } from "@/hooks/use-toast";
-import RevokeMfa from "./_common/RevokeMfa";
+import RevokeMfa from "@/app/(main)/components/RevokeMfa";
 
 const EnableMfa = () => {
   //const queryClient = useQueryClient();

@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { revokeMFAMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";

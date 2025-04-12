@@ -26,7 +26,7 @@ import {
   SidebarFooter,
   SidebarRail,
   useSidebar,
-} from "@/components/ui/sidebar";
+} from "@/app/components/sidebar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,11 +34,11 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import Logo from "@/components/logo";
+} from "@/app/components/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/app/components/avatar";
+import Logo from "@/app/components/logo";
 import { useAuthContext } from "@/context/auth-provider";
-import LogoutDialog from "./_common/LogoutDialog";
+import LogoutDialog from "@/app/(main)/components/LogoutDialog";
 import { useTheme } from "next-themes";
 
 const Asidebar = () => {
