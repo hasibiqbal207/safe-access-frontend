@@ -16,7 +16,7 @@ import {
 import sessionRouter from "./session.auth.route.js";
 import securityRouter from "./security.auth.route.js";
 import passwordRouter from "./password.auth.route.js";
-import twoFactorRouter from "./2fa.auth.route.js";
+import twoFactorRouter from "./mfa.auth.route.js";
 
 import { validateRequest } from "../../middlewares/validation.middleware.js";
 import {
@@ -44,7 +44,7 @@ router.post("/resend-verification", authenticateToken as express.RequestHandler,
 
 // Logout routes
 router.post("/logout", authenticateToken as express.RequestHandler, logoutHandler);
-router.post("/logout/all", authenticateToken as express.RequestHandler, logoutAllHandler);
+router.post("/logout-all", authenticateToken as express.RequestHandler, logoutAllHandler);
 
 // Refresh token routes
 router.post("/refresh", validateRequest(refreshTokenSchema), authenticateToken as express.RequestHandler, refreshTokenHandler as express.RequestHandler);
@@ -58,7 +58,7 @@ router.use("/security", securityRouter);
 // Password Management routes
 router.use("/password", passwordRouter);
 
-// 2FA routes
-router.use("/2fa", twoFactorRouter);
+// MFA routes
+router.use("/mfa", twoFactorRouter);
 
 export default router;
