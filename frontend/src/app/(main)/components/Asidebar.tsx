@@ -36,7 +36,6 @@ import {
   DropdownMenuTrigger,
 } from "@/app/components/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/app/components/avatar";
-import Logo from "@/app/components/logo";
 import { useAuthContext } from "@/context/auth-provider";
 import LogoutDialog from "@/app/(main)/components/LogoutDialog";
 import { useTheme } from "next-themes";
@@ -76,13 +75,12 @@ const Asidebar = () => {
       <Sidebar collapsible="icon">
         <SidebarHeader className="!pt-0 dark:bg-background">
           <div className="flex h-[60px] items-center">
-            <Logo fontSize="20px" size="30px" url="/home" />
             {open && (
               <Link
                 href="/home"
                 className="hidden md:flex ml-2 text-xl tracking-[-0.16px] text-black dark:text-[#fcfdffef] font-bold mb-0"
               >
-                Squeezy
+                Safe Access
               </Link>
             )}
           </div>

@@ -18,12 +18,22 @@ import { Button } from "@/app/components/button";
 import { loginMutationFn } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
+import { setCookie } from "cookies-next";
 
 // Define response and error types
 interface LoginResponse {
   data: {
-    mfaRequired?: boolean;
-  };
+    success?: boolean;
+    message?: string;
+    data: {
+      user?: {
+        is2FAEnabled: boolean;
+      };
+      requires2FA?: boolean;
+      accessToken?: string;
+      refreshToken?: string;
+    }
+  }
 }
 
 interface LoginError {
@@ -59,13 +69,54 @@ export default function Login() {
   const onSubmit = (values: FormValues) => {
     mutate(values, {
       onSuccess: (response: LoginResponse) => {
-        if (response.data.mfaRequired) {
-          router.replace(`/verify-mfa?email=${values.email}`);
+        if (!response.data.data) {
+          console.error("Response data is undefined or null");
+          toast({
+            title: "Error",
+            description: "Invalid response from server",
+            variant: "destructive",
+          });
           return;
         }
-        router.replace(`/home`);
+
+        if (response.data.data.accessToken) {
+          setCookie("accessToken", response.data.data.accessToken, {
+            maxAge: 60 * 60 * 24, 
+            path: "/",
+          });
+                    
+          localStorage.setItem("accessToken", response.data.data.accessToken);
+        }
+        
+        if (response.data.data.refreshToken) {
+          setCookie("refreshToken", response.data.data.refreshToken, {
+            maxAge: 60 * 60 * 24 * 30, 
+            path: "/",
+          });
+          
+          localStorage.setItem("refreshToken", response.data.data.refreshToken);
+        }
+        
+        if (response.data.data.requires2FA || (response.data.data.user && response.data.data.user.is2FAEnabled)) {
+          console.log("2FA required, redirecting to verification page");
+          router.push(`/verify-mfa?email=${values.email}`);
+          return;
+        }
+
+        try {
+          router.push("/home");
+          setTimeout(() => {
+            if (window.location.pathname === "/") {
+              window.location.href = "/home";
+            }
+          }, 500);
+        } catch (error) {
+          console.error("Navigation error:", error);
+          window.location.href = "/home";
+        }
       },
       onError: (error: LoginError) => {
+        console.error("Login error:", error);
         toast({
           title: "Error",
           description: error.message,

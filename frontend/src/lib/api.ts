@@ -41,13 +41,41 @@ type SessionType = {
 
 type SessionResponseType = {
   message: string;
-  sessions: SessionType[];
+  data: {
+    sessions: SessionType[];
+  };
 };
 
 export type mfaType = {
   message: string;
   secret: string;
   qrImageUrl: string;
+};
+
+const getAccessToken = () => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  return token ? `Bearer ${token}` : '';
+}; 
+
+const getRefreshToken = () => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
+  return token;
+};
+
+// Helper function for authenticated API calls
+const withAuth = async <T>(apiCall: () => Promise<T>): Promise<T> => {
+  const token = getAccessToken();
+  if (token) {
+    API.defaults.headers.common['Authorization'] = token;
+  }
+  try {
+    return await apiCall();
+  } finally {
+    // Clean up to prevent token leaking to non-auth requests
+    if (API.defaults.headers.common['Authorization']) {
+      delete API.defaults.headers.common['Authorization'];
+    }
+  }
 };
 
 {/* Authentication API's */}
@@ -63,9 +91,11 @@ export const resendVerificationEmailMutationFn = async () =>
 export const loginMutationFn = async (data: LoginType) =>
   await API.post("/auth/login", data);
 
-export const logoutMutationFn = async () => await API.post(`/auth/logout`);
+export const logoutMutationFn = async () => 
+  await withAuth(() => API.post(`/auth/logout`, { refreshToken: getRefreshToken() }));
 
-export const logoutAllMutationFn = async () => await API.post(`/auth/logout-all`);
+export const logoutAllMutationFn = async () => 
+  await withAuth(() => API.post(`/auth/logout-all`));
 
 export const refreshTokenMutationFn = async () => await API.post(`/auth/refresh`);
 
@@ -77,47 +107,53 @@ export const resetPasswordMutationFn = async (data: resetPasswordType) =>
   await API.post(`/auth/password/reset`, data);
 
 export const changePasswordMutationFn = async (data: changePasswordType) =>
-  await API.put(`/auth/password/change`, data);
+  await withAuth(() => API.put(`/auth/password/change`, data));
 
 {/* MFA API's */}
 export const mfaSetupQueryFn = async () => {
-  const response = await API.get<mfaType>(`auth/mfa/setup`);
+  const response = await withAuth(() => API.get<mfaType>(`auth/mfa/setup`));
   return response.data;
 };
 
-export const enableMFAMutationFn = async (data: enableMFAType) => await API.put(`/auth/mfa/enable`, data);
+export const enableMFAMutationFn = async (data: enableMFAType) => 
+  await withAuth(() => API.put(`/auth/mfa/enable`, data));
 
-export const disableMFAMutationFn = async (data: disableMFAType) => await API.put(`/auth/mfa/disable`, data);
+export const disableMFAMutationFn = async (data: disableMFAType) => 
+  await withAuth(() => API.put(`/auth/mfa/disable`, data));
 
 export const verifyMFALoginMutationFn = async (data: mfaLoginType) =>
   await API.post(`/auth/mfa/verify`, data);
 
 export const generateBackupCodesMutationFn = async () =>
-  await API.post(`/auth/mfa/generate-backup-codes`);
+  await withAuth(() => API.post(`/auth/mfa/generate-backup-codes`));
 
 {/* Session API's */}
-export const getUserSessionQueryFn = async () => await API.get(`/auth/session/`);
-
-export const sessionsQueryFn = async () => {
-  const response = await API.get<SessionResponseType>(`/auth/sessions/`);
+export const getUserSessionQueryFn = async () => {
+  const response = await withAuth(() => API.get(`/auth/sessions/`));
   return response.data;
 };
 
+export const sessionsQueryFn = async () => {
+  const response = await withAuth(() => API.get<SessionResponseType>(`/auth/sessions/all`));
+  return response.data.data;
+};
+
 export const sessionDelMutationFn = async (id: string) =>
-  await API.delete(`/auth/sessions/${id}`);
+  await withAuth(() => API.delete(`/auth/sessions/${id}`));
 
 export const sessionDelAllMutationFn = async () =>
-  await API.delete(`/auth/sessions/all`);
+  await withAuth(() => API.delete(`/auth/sessions/all`));
 
 {/* User API's */}
-export const getUserQueryFn = async () => await API.get(`/users/profile`);
+export const getUserQueryFn = async () => 
+  await withAuth(() => API.get(`/users/profile`));
 
 export const updateUserMutationFn = async (data: updateUserType) =>
-  await API.put(`/users/profile`, data);
+  await withAuth(() => API.put(`/users/profile`, data));
 
 export const changeUserEmailMutationFn = async (data: changeUserEmailType) =>
-  await API.put(`/users/change-email`, data);
+  await withAuth(() => API.put(`/users/change-email`, data));
 
 export const deleteUserMutationFn = async (id: string) =>
-  await API.delete(`/users/delete/${id}`);
+  await withAuth(() => API.delete(`/users/delete/${id}`));
 

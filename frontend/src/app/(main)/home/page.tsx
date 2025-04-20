@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import EnableMfa from "../components/EnableMfa";
 import Sessions from "../components/Sessions";
@@ -10,7 +11,7 @@ const Home = () => {
           Setup security and sessions
         </h1>
         <p className="text-sm text-[#0007149f] dark:text-gray-100 font-normal">
-          Follow the steps to activate using the Squeezy.
+          Follow the steps to activate using.
         </p>
       </div>
       <div className="relative max-w-3xl py-0 mx-auto w-full px-6 md:max-w-5xl">

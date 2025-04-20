@@ -1,13 +1,15 @@
 import { Router } from "express";
 import {
-  getSessionsHandler,
+  getSessionHandler,
+  getAllSessionsHandler,
   deleteAllSessionsHandler,
   deleteSessionHandler,
 } from "../../controllers/auth/session.auth.controller.js";
 
 const router = Router();
 
-router.get("/", getSessionsHandler);
+router.get("/", getSessionHandler);
+router.get("/all", getAllSessionsHandler);
 router.delete("/all", deleteAllSessionsHandler);
 router.delete("/:sessionId", deleteSessionHandler);
 

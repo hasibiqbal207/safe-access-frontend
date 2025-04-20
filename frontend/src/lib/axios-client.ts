@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 const options = {
-  baseURL: process.env.BACKEND_URL,
+  baseURL: backendUrl,
   withCredentials: true,
   timeout: 10000,
 };
@@ -17,7 +19,6 @@ API.interceptors.response.use(
   },
   async (error) => {
     const { data, status } = error.response;
-    console.log(data, "data");
     if (data.errorCode === "AUTH_TOKEN_NOT_FOUND" && status === 401) {
       try {
         await APIRefresh.get("/auth/refresh");

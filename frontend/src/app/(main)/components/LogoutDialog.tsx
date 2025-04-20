@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback } from "react";
+import { deleteCookie } from "cookies-next";
 
 const LogoutDialog = (props: {
   isOpen: boolean;
@@ -24,7 +25,19 @@ const LogoutDialog = (props: {
   const { mutate, isPending } = useMutation({
     mutationFn: logoutMutationFn,
     onSuccess: () => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      
+      deleteCookie("accessToken");
+      deleteCookie("refreshToken");
+      
       router.replace("/");
+      
+      setTimeout(() => {
+        if (window.location.pathname !== "/") {
+          window.location.href = "/";
+        }
+      }, 100);
     },
     onError: (error) => {
       toast({
@@ -37,7 +50,8 @@ const LogoutDialog = (props: {
 
   const handleLogout = useCallback(() => {
     mutate();
-  }, []);
+  }, [mutate]);
+  
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

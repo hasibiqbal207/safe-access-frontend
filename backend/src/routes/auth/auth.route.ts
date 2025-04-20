@@ -13,6 +13,7 @@ import {
   resendVerificationHandler,
 } from "../../controllers/auth/verification.auth.controller.js";
 
+import { getSessionHandler } from "../../controllers/auth/session.auth.controller.js";
 import sessionRouter from "./session.auth.route.js";
 import securityRouter from "./security.auth.route.js";
 import passwordRouter from "./password.auth.route.js";
@@ -50,7 +51,7 @@ router.post("/logout-all", authenticateToken as express.RequestHandler, logoutAl
 router.post("/refresh", validateRequest(refreshTokenSchema), authenticateToken as express.RequestHandler, refreshTokenHandler as express.RequestHandler);
 
 // User Session routes
-router.use("/sessions", sessionRouter);
+router.use("/sessions", authenticateToken as express.RequestHandler, sessionRouter);
 
 // Security routes
 router.use("/security", securityRouter);

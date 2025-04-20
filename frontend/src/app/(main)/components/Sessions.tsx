@@ -1,29 +1,76 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import SessionItem from "./SessionItem";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { sessionDelMutationFn, sessionsQueryFn } from "@/lib/api";
 import { Loader } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
+// Define the SessionType interface based on the one in the API file
+interface SessionType {
+  _id: string;
+  userId: string;
+  userAgent: string;
+  createdAt: string;
+  expiresAt: string;
+  isCurrent: boolean;
+}
+
+interface SessionsData {
+  message: string;
+  sessions: SessionType[];
+}
+
 const Sessions = () => {
-  const { data, isLoading, refetch } = useQuery({
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      console.log('Auth token exists:', !!token);
+      
+      if (!token) {
+        console.warn('No auth token found. Please log in again.');
+        toast({
+          title: "Authentication Warning",
+          description: "No authentication token found. You may need to log in again.",
+          variant: "destructive",
+        });
+      }
+    }
+  }, []);
+
+  const { data, isLoading, refetch, error } = useQuery({
     queryKey: ["sessions"],
     queryFn: sessionsQueryFn,
     staleTime: Infinity,
+    retry: 3,
+    enabled: isMounted
   });
+
+  useEffect(() => {
+    if (error) {
+      console.error("Sessions fetch error:", error);
+      toast({
+        title: "Error loading sessions",
+        description: error instanceof Error ? error.message : "Failed to fetch sessions data",
+        variant: "destructive",
+      });
+    }
+  }, [error]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: sessionDelMutationFn,
   });
 
-  const sessions = data?.sessions || [];
-
-  const currentSession = sessions?.find((session) => session.isCurrent);
-  const otherSessions = sessions?.filter(
+  const sessions = (data as SessionsData)?.sessions || [];
+  const currentSession = sessions.find((session) => session.isCurrent);
+  const otherSessions = sessions.filter(
     (session) => session.isCurrent !== true
   );
-
+  
   const handleDelete = useCallback((id: string) => {
     mutate(id, {
       onSuccess: () => {
@@ -33,15 +80,15 @@ const Sessions = () => {
           description: "Session removed successfully",
         });
       },
-      onError: (error) => {
+      onError: (error: unknown) => {
         toast({
           title: "Error",
-          description: error.message,
+          description: error instanceof Error ? error.message : "Failed to remove session",
           variant: "destructive",
         });
       },
     });
-  }, []);
+  }, [mutate, refetch]);
 
   return (
     <div className="via-root to-root rounded-xl bg-gradient-to-r p-0.5">
@@ -56,16 +103,16 @@ const Sessions = () => {
         </p>
         {isLoading ? (
           <Loader size="35px" className="animate-spin" />
+        ) : error ? (
+          <div className="text-red-500">
+            Failed to load sessions. Please try again.
+          </div>
         ) : (
           <div className="rounded-t-xl max-w-xl">
             <div>
               <h5 className="text-base font-semibold">
-                Current active session
+                Current session
               </h5>
-              <p className="mb-6 text-sm text-[#0007149f] dark:text-gray-100">
-                You’re logged into this Squeezy account on this device and are
-                currently using it.
-              </p>
             </div>
             <div className="w-full">
               {currentSession && (
@@ -81,12 +128,11 @@ const Sessions = () => {
               <div className="mt-4">
                 <h5 className="text-base font-semibold">Other sessions</h5>
                 <ul
-                  className="mt-4 w-full space-y-3 max-h-[400px
-                overflow-y-auto
-                "
+                  className="mt-4 w-full space-y-3 max-h-[400px]
+                  overflow-y-auto"
                 >
-                  {otherSessions?.map((session) => (
-                    <li>
+                  {otherSessions.map((session) => (
+                    <li key={session._id}>
                       <SessionItem
                         loading={isPending}
                         userAgent={session.userAgent}
