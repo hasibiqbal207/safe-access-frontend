@@ -127,7 +127,6 @@ export const mfaSetupQueryFn = async () => {
 };
 
 export const enableMFAMutationFn = async (data: enableMFAType) => {
-  console.log('Sending enable MFA request:', data);
   return await withAuth(() => API.post(`/auth/mfa/enable`, data));
 };
 

@@ -9,9 +9,7 @@ type UserType = {
   isEmailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
-  userPreferences: {
-    enable2FA: boolean;
-  };
+  is2FAEnabled: boolean;
 };
 
 type AuthContextType = {
@@ -28,8 +26,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { data, error, isLoading, isFetching, refetch } = useAuth();
-  const user = data?.data?.user;
-
+  console.log("Auth data:", data);
+  
+  // The profile API returns user data in data.data.user or directly in data.data
+  const user = data?.data?.data?.user || data?.data?.data;
+  console.log("Extracted user:", user);
+  
   return (
     <AuthContext.Provider
       value={{ user, error, isLoading, isFetching, refetch }}

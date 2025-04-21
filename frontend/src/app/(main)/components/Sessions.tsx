@@ -97,9 +97,7 @@ const Sessions = () => {
           Sessions
         </h3>
         <p className="mb-6 max-w-xl text-sm text-[#0007149f] dark:text-gray-100 font-normal">
-          Sessions are the devices you are using or that have used your Squeezy
-          These are the sessions where your account is currently logged in. You
-          can log out of each session.
+          Sessions are the devices you are using or that have used your account. 
         </p>
         {isLoading ? (
           <Loader size="35px" className="animate-spin" />

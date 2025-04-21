@@ -145,7 +145,7 @@ const EnableMfa = () => {
           <h3 className="text-xl tracking-[-0.16px] text-slate-12 font-bold mb-1">
             Multi-Factor Authentication (MFA)
           </h3>
-          {user?.userPreferences?.enable2FA && (
+          {user?.is2FAEnabled && (
             <span
               className="select-none whitespace-nowrap font-medium bg-green-100 text-green-500
           text-xs h-6 px-2 rounded flex flex-row items-center justify-center gap-1"
@@ -158,7 +158,7 @@ const EnableMfa = () => {
         <p className="mb-6 text-sm text-[#0007149f] dark:text-gray-100 font-normal">
           Protect your account by adding an extra layer of security.
         </p>
-        {user?.userPreferences?.enable2FA ? (
+        {user?.is2FAEnabled ? (
           <RevokeMfa />
         ) : (
           <Dialog modal open={isOpen} onOpenChange={setIsOpen}>
