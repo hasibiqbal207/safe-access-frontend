@@ -3,6 +3,7 @@ import logger from "../../../config/logger.config.js";
 import { ApiResponse } from "../../interfaces/response.interface.js";
 import { setup2FA, enable2FA, verify2FA, disable2FA, generateNewBackupCodes } from "../../services/auth/2fa.auth.service.js";
 import { logAuditEvent, AuditEventType } from "../../utils/audit-logger.util.js";
+import { UserModel } from "../../models/index.js";
 
 export const setup2FAHandler = async (
     req: Request,
@@ -215,6 +216,69 @@ export const setup2FAHandler = async (
         message: error instanceof Error ? error.message : "Failed to generate backup codes",
         error: {
           code: "BACKUP_CODES_GENERATION_FAILED",
+        },
+      });
+    }
+  };
+  
+  export const verifyMFALoginHandler = async (
+    req: Request,
+    res: Response<ApiResponse>
+  ) => {
+    try {
+      const { token, email } = req.body;
+
+      // Find user by email
+      const user = await UserModel.findOne({ email });
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      // Verify the MFA token
+      const isValid = await verify2FA(user._id.toString(), token);
+      if (!isValid) {
+        throw new Error("Invalid 2FA code");
+      }
+      
+      // Log successful 2FA verification during login
+      await logAuditEvent(
+        user._id.toString(),
+        AuditEventType.MFA_VERIFIED,
+        { email: user.email },
+        req
+      );
+
+      res.json({
+        success: true,
+        message: "2FA verification successful",
+      });
+    } catch (error) {
+      logger.error("2FA login verification handler error:", error);
+      
+      // Try to get user for audit logging
+      try {
+        const user = await UserModel.findOne({ email: req.body.email });
+        if (user) {
+          await logAuditEvent(
+            user._id.toString(),
+            AuditEventType.LOGIN_FAILED,
+            { 
+              reason: error instanceof Error ? error.message : "Unknown error",
+              email: req.body.email
+            },
+            req
+          );
+        }
+      } catch (logError) {
+        logger.error("Failed to log 2FA login verification failure:", logError);
+      }
+      
+      res.status(401).json({
+        success: false,
+        message:
+          error instanceof Error ? error.message : "2FA verification failed",
+        error: {
+          code: "2FA_LOGIN_VERIFICATION_FAILED",
         },
       });
     }

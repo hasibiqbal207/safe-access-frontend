@@ -40,6 +40,9 @@ interface LoginError {
   message: string;
 }
 
+// Create a temporary storage mechanism for MFA flow
+const MFA_TEMP_STORAGE_KEY = 'mfa_temp_auth';
+
 export default function Login() {
   const router = useRouter();
   const { mutate, isPending } = useMutation({
@@ -78,42 +81,30 @@ export default function Login() {
           });
           return;
         }
-
-        if (response.data.data.accessToken) {
-          setCookie("accessToken", response.data.data.accessToken, {
-            maxAge: 60 * 60 * 24, 
-            path: "/",
-          });
-                    
-          localStorage.setItem("accessToken", response.data.data.accessToken);
-        }
         
-        if (response.data.data.refreshToken) {
-          setCookie("refreshToken", response.data.data.refreshToken, {
-            maxAge: 60 * 60 * 24 * 30, 
-            path: "/",
-          });
-          
-          localStorage.setItem("refreshToken", response.data.data.refreshToken);
-        }
-        
+        // Check if MFA is required
         if (response.data.data.requires2FA || (response.data.data.user && response.data.data.user.is2FAEnabled)) {
-          console.log("2FA required, redirecting to verification page");
+          console.log("2FA required, storing temporary tokens and redirecting to verification page");
+          
+          // Store tokens temporarily in session storage (more secure than localStorage)
+          // This data will be cleared after MFA verification or when the session ends
+          sessionStorage.setItem(MFA_TEMP_STORAGE_KEY, JSON.stringify({
+            accessToken: response.data.data.accessToken,
+            refreshToken: response.data.data.refreshToken,
+            email: values.email,
+            timestamp: Date.now() // Add timestamp for potential expiry checks
+          }));
+          
+          // Redirect to MFA verification page
           router.push(`/verify-mfa?email=${values.email}`);
           return;
         }
 
-        try {
-          router.push("/home");
-          setTimeout(() => {
-            if (window.location.pathname === "/") {
-              window.location.href = "/home";
-            }
-          }, 500);
-        } catch (error) {
-          console.error("Navigation error:", error);
-          window.location.href = "/home";
-        }
+        // If no MFA required, store tokens normally
+        storeAuthTokens(response.data.data.accessToken, response.data.data.refreshToken);
+        
+        // Redirect to home page
+        navigateToHome();
       },
       onError: (error: LoginError) => {
         console.error("Login error:", error);
@@ -124,6 +115,40 @@ export default function Login() {
         });
       },
     });
+  };
+  
+  // Helper function to store auth tokens
+  const storeAuthTokens = (accessToken?: string, refreshToken?: string) => {
+    if (accessToken) {
+      setCookie("accessToken", accessToken, {
+        maxAge: 60 * 60 * 24, 
+        path: "/",
+      });
+      localStorage.setItem("accessToken", accessToken);
+    }
+    
+    if (refreshToken) {
+      setCookie("refreshToken", refreshToken, {
+        maxAge: 60 * 60 * 24 * 30, 
+        path: "/",
+      });
+      localStorage.setItem("refreshToken", refreshToken);
+    }
+  };
+  
+  // Helper function to navigate to home
+  const navigateToHome = () => {
+    try {
+      router.push("/home");
+      setTimeout(() => {
+        if (window.location.pathname === "/") {
+          window.location.href = "/home";
+        }
+      }, 500);
+    } catch (error) {
+      console.error("Navigation error:", error);
+      window.location.href = "/home";
+    }
   };
 
   return (
@@ -168,7 +193,7 @@ export default function Login() {
                       Password
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="••••••••••••" {...field} />
+                      <Input placeholder="••••••••••••" type="password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

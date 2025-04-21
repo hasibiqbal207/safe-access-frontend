@@ -26,9 +26,9 @@ type changeUserEmailType = {
 };
 
 type verifyEmailType = { code: string };
-type enableMFAType = { secretKey: string };
-type disableMFAType = { secretKey: string };
-type mfaLoginType = { code: string; email: string };
+type enableMFAType = { token: string };
+type disableMFAType = { password: string };
+type mfaLoginType = { token: string; email: string };
 
 type SessionType = {
   _id: string;
@@ -49,7 +49,7 @@ type SessionResponseType = {
 export type mfaType = {
   message: string;
   secret: string;
-  qrImageUrl: string;
+  qrCodeUrl: string;
 };
 
 const getAccessToken = () => {
@@ -111,18 +111,34 @@ export const changePasswordMutationFn = async (data: changePasswordType) =>
 
 {/* MFA API's */}
 export const mfaSetupQueryFn = async () => {
-  const response = await withAuth(() => API.get<mfaType>(`auth/mfa/setup`));
-  return response.data;
+  try {
+    const response = await withAuth(() => API.get<mfaType>(`/auth/mfa/setup`));
+    console.log('MFA setup response:', response.data);
+    // If the response is nested, extract the data field
+    if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+      console.log('API response contains nested data, extracting...');
+      return response.data.data as mfaType;
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching MFA setup:', error);
+    throw error;
+  }
 };
 
-export const enableMFAMutationFn = async (data: enableMFAType) => 
-  await withAuth(() => API.put(`/auth/mfa/enable`, data));
+export const enableMFAMutationFn = async (data: enableMFAType) => {
+  console.log('Sending enable MFA request:', data);
+  return await withAuth(() => API.post(`/auth/mfa/enable`, data));
+};
 
 export const disableMFAMutationFn = async (data: disableMFAType) => 
-  await withAuth(() => API.put(`/auth/mfa/disable`, data));
+  await withAuth(() => API.post(`/auth/mfa/disable`, data));
+
+export const revokeMFAMutationFn = async () => 
+  await withAuth(() => API.post(`/auth/mfa/disable`, { password: '' }));
 
 export const verifyMFALoginMutationFn = async (data: mfaLoginType) =>
-  await API.post(`/auth/mfa/verify`, data);
+  await API.post(`/auth/mfa/verify-login`, data);
 
 export const generateBackupCodesMutationFn = async () =>
   await withAuth(() => API.post(`/auth/mfa/generate-backup-codes`));

@@ -17,5 +17,10 @@ export const refreshTokenSchema = Joi.object({
 });
 
 export const verifyEmailSchema = Joi.object({
-  verification_token: Joi.string().required(),
+  code: Joi.string().required(),
+});
+
+export const verifyMFALoginSchema = Joi.object({
+  token: Joi.string().required(),
+  email: Joi.string().email().required(),
 });

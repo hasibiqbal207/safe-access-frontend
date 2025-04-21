@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { z } from "zod";
 import { Check, Copy, Loader } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -29,7 +29,7 @@ import {
 import { Button } from "@/app/components/button";
 import { useAuthContext } from "@/context/auth-provider";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { mfaSetupQueryFn, mfaType, verifyMFAMutationFn } from "@/lib/api";
+import { mfaSetupQueryFn, mfaType, enableMFAMutationFn } from "@/lib/api";
 import { Skeleton } from "@/app/components/skeleton";
 import { toast } from "@/hooks/use-toast";
 import RevokeMfa from "@/app/(main)/components/RevokeMfa";
@@ -41,18 +41,35 @@ const EnableMfa = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["mfa-setup"],
     queryFn: mfaSetupQueryFn,
     enabled: isOpen,
     staleTime: Infinity,
   });
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: verifyMFAMutationFn,
-  });
+  // Extract data correctly, handling potential nesting in the API response
+  const mfaData = data && typeof data === 'object' && 'data' in data 
+    ? data.data as mfaType 
+    : (data as mfaType) ?? ({} as mfaType);
 
-  const mfaData = data ?? ({} as mfaType);
+  // Debug log for component
+  useEffect(() => {
+    if (data) {
+      console.log('MFA data in component:', data);
+      // Check if the data has a nested data property (common in REST APIs)
+      if (typeof data === 'object' && 'data' in data) {
+        console.log('Data is nested in a data property, extracting...');
+      }
+    }
+    if (error) {
+      console.error('MFA setup error:', error);
+    }
+  }, [data, error]);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: enableMFAMutationFn,
+  });
 
   const FormSchema = z.object({
     pin: z.string().min(6, {
@@ -67,16 +84,37 @@ const EnableMfa = () => {
     },
   });
 
+  // Ensure QR code URL is properly formatted as a data URL
+  const sanitizedQrCodeUrl = useMemo(() => {
+    if (!mfaData?.qrCodeUrl) return '';
+    
+    // If it's already a properly formatted data URL, return as is
+    if (mfaData.qrCodeUrl.startsWith('data:image/')) {
+      return mfaData.qrCodeUrl;
+    }
+    
+    // If it's just the base64 content without the data URL prefix, add it
+    if (mfaData.qrCodeUrl.startsWith('/9j/') || mfaData.qrCodeUrl.startsWith('iVBOR')) {
+      return `data:image/png;base64,${mfaData.qrCodeUrl}`;
+    }
+    
+    return mfaData.qrCodeUrl;
+  }, [mfaData.qrCodeUrl]);
+
   function onSubmit(values: z.infer<typeof FormSchema>) {
+    console.log('Starting submit with values:', values);
+    console.log('MFA data available:', mfaData);
+    
+    // The backend only expects the token parameter
     const data = {
-      code: values.pin,
-      secretKey: mfaData.secret,
+      token: values.pin,
     };
+    
+    console.log('Sending data to enable MFA:', data);
+    
     mutate(data, {
       onSuccess: (response: any) => {
-        // queryClient.invalidateQueries({
-        //   queryKey: ["authUser"],
-        // });
+        console.log('MFA enable success response:', response);
         refetch();
         setIsOpen(false);
         toast({
@@ -84,7 +122,8 @@ const EnableMfa = () => {
           description: response.message,
         });
       },
-      onError: (error) => {
+      onError: (error: any) => {
+        console.error('MFA enable error:', error);
         toast({
           title: "Error",
           description: error.message,
@@ -162,16 +201,20 @@ const EnableMfa = () => {
               </div>
               <div className="mt-4 flex flex-row items-center gap-4">
                 <div className=" shrink-0 rounded-md border p-2  border-[#0009321f] dark:border-gray-600 bg-white">
-                  {isLoading || !mfaData?.qrImageUrl ? (
+                  {isLoading || !mfaData?.qrCodeUrl ? (
                     <Skeleton className="w-[160px] h-[160px]" />
                   ) : (
                     <img
                       alt="QR code"
                       decoding="async"
-                      src={mfaData.qrImageUrl}
+                      src={sanitizedQrCodeUrl}
                       width="160"
                       height="160"
                       className="rounded-md"
+                      onError={(e) => {
+                        console.error('QR code image failed to load');
+                        e.currentTarget.style.display = 'none';
+                      }}
                     />
                   )}
                 </div>
@@ -185,7 +228,7 @@ const EnableMfa = () => {
                       <span>Copy setup key</span>
                       <button
                         disabled={copied}
-                        onClick={() => onCopy(mfaData?.qrImageUrl)}
+                        onClick={() => onCopy(mfaData?.secret || '')}
                       >
                         {copied ? (
                           <Check className="w-4 h-4" />
@@ -195,7 +238,7 @@ const EnableMfa = () => {
                       </button>
                     </div>
                     <p className="text-sm block truncate w-[200px] text-black dark:text-muted-foreground">
-                      {mfaData?.secret}
+                      {mfaData?.secret || 'No secret key available'}
                     </p>
                   </div>
                 ) : (
