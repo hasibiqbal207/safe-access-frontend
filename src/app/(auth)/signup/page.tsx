@@ -15,7 +15,7 @@ import {
 import { Input } from "@/app/components/input";
 import { Button } from "@/app/components/button";
 import { ArrowRight, Loader, MailCheckIcon } from "lucide-react";
-import Logo from "@/app/components/logo";
+
 import { useMutation } from "@tanstack/react-query";
 import { registerMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";

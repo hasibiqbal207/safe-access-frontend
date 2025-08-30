@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  development:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: safe-access-fe-dev
+    ports:
+      - "6004:6004"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  # Production service
+  production:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+    container_name: safe-access-fe-prod
+    ports:
+      - "6004:6004"
+    environment:
+      - NODE_ENV=production
+    command: npm run start

@@ -2,6 +2,7 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { z } from "zod";
 import { Check, Copy, Loader } from "lucide-react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -113,16 +114,16 @@ const EnableMfa = () => {
     console.log('Sending data to enable MFA:', data);
     
     mutate(data, {
-      onSuccess: (response: any) => {
+      onSuccess: (response) => {
         console.log('MFA enable success response:', response);
         refetch();
         setIsOpen(false);
         toast({
           title: "Success",
-          description: response.message,
+          description: response.data.message,
         });
       },
-      onError: (error: any) => {
+      onError: (error: { message: string }) => {
         console.error('MFA enable error:', error);
         toast({
           title: "Error",
@@ -204,12 +205,11 @@ const EnableMfa = () => {
                   {isLoading || !mfaData?.qrCodeUrl ? (
                     <Skeleton className="w-[160px] h-[160px]" />
                   ) : (
-                    <img
+                    <Image
                       alt="QR code"
-                      decoding="async"
                       src={sanitizedQrCodeUrl}
-                      width="160"
-                      height="160"
+                      width={160}
+                      height={160}
                       className="rounded-md"
                       onError={(e) => {
                         console.error('QR code image failed to load');
@@ -243,7 +243,7 @@ const EnableMfa = () => {
                   </div>
                 ) : (
                   <span className="text-sm text-[#0007149f] dark:text-muted-foreground font-normal">
-                    Can't scan the code?
+                    Can&apos;t scan the code?
                     <button
                       className="block text-primary transition duration-200 ease-in-out hover:underline
                    dark:text-white"

@@ -115,7 +115,7 @@ const VerifyMfa = () => {
     };
     
     mutate(data, {
-      onSuccess: (response) => {
+      onSuccess: () => {
         // MFA verification successful - now we can store the tokens
         console.log("MFA verification successful, storing permanent tokens");
         

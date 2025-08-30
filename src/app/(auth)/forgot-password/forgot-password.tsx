@@ -16,7 +16,6 @@ import {
 } from "@/app/components/form";
 import { Input } from "@/app/components/input";
 import { Button } from "@/app/components/button";
-import Logo from "@/app/components/logo";
 import { forgotPasswordMutationFn } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
@@ -48,7 +47,7 @@ export default function ForgotPassword() {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     mutate(values, {
-      onSuccess: (response: any) => {
+      onSuccess: () => {
         setIsSubmitted(true);
       },
       onError: (error) => {

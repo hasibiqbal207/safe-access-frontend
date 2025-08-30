@@ -45,21 +45,23 @@ const RevokeMfa = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: disableMFAMutationFn,
-    onSuccess: (response: any) => {
+    onSuccess: (response) => {
+      const message = response.data?.message || "MFA disabled successfully";
       queryClient.invalidateQueries({
         queryKey: ["authUser"],
       });
       toast({
         title: "Success",
-        description: response.message,
+        description: message,
       });
       setIsOpen(false);
       form.reset();
     },
-    onError: (error: any) => {
+    onError: (error: { message: string; response?: { data?: { message: string } } }) => {
+      const errorMessage = error.response?.data?.message || error.message;
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     },

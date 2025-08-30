@@ -15,7 +15,7 @@ import {
 } from "@/app/components/form";
 import { Input } from "@/app/components/input";
 import { Button } from "@/app/components/button";
-import Logo from "@/app/components/logo";
+
 import { ArrowLeft, Frown, Loader } from "lucide-react";
 import Link from "next/link";
 import { resetPasswordMutationFn } from "@/lib/api";
@@ -63,8 +63,8 @@ export default function ResetPassword() {
       return;
     }
     const data = {
-      password: values.password,
-      verificationCode: code,
+      token: code,
+      newPassword: values.password,
     };
     mutate(data, {
       onSuccess: () => {
