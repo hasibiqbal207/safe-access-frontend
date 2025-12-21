@@ -45,6 +45,11 @@ const clearAuthAndRedirect = () => {
 // REQUEST INTERCEPTOR - Attach access token to all requests
 API.interceptors.request.use(
   (config) => {
+    // If Authorization header is already set (e.g., for MFA with intermediate token), don't override it
+    if (config.headers['Authorization']) {
+      return config;
+    }
+
     // Skip adding token for public auth endpoints
     const publicEndpoints = [
       '/auth/login',
@@ -53,7 +58,6 @@ API.interceptors.request.use(
       '/auth/resend-verification',
       '/auth/password/forgot',
       '/auth/password/reset',
-      '/auth/mfa/verify-login'
     ];
 
     const isPublicEndpoint = publicEndpoints.some(endpoint =>

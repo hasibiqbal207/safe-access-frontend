@@ -28,7 +28,7 @@ type changeUserEmailType = {
 type verifyEmailType = { code: string };
 type enableMFAType = { token: string };
 type disableMFAType = { password: string };
-type mfaLoginType = { token: string; email: string };
+type mfaLoginType = { token: string };
 
 type SessionType = {
   _id: string;
@@ -126,8 +126,16 @@ export const disableMFAMutationFn = async (data: disableMFAType) =>
 export const revokeMFAMutationFn = async () =>
   await API.post(`/auth/mfa/disable`, { password: '' }, { headers: getAuthHeaders() });
 
-export const verifyMFALoginMutationFn = async (data: mfaLoginType) =>
-  await API.post(`/auth/mfa/verify-login`, data);
+export const verifyMFALoginMutationFn = async (
+  data: mfaLoginType,
+  intermediateToken?: string
+) => {
+  const headers = intermediateToken
+    ? { Authorization: `Bearer ${intermediateToken}` }
+    : {};
+
+  return await API.post(`/auth/mfa/verify`, data, { headers });
+};
 
 export const generateBackupCodesMutationFn = async () =>
   await API.post(`/auth/mfa/generate-backup-codes`, {}, { headers: getAuthHeaders() });

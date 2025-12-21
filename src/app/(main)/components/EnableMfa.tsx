@@ -34,6 +34,7 @@ import { mfaSetupQueryFn, mfaType, enableMFAMutationFn } from "@/lib/api";
 import { Skeleton } from "@/app/components/skeleton";
 import { toast } from "@/hooks/use-toast";
 import RevokeMfa from "@/app/(main)/components/RevokeMfa";
+import BackupCodesDialog from "@/app/(main)/components/BackupCodesDialog";
 
 const EnableMfa = () => {
   //const queryClient = useQueryClient();
@@ -41,6 +42,8 @@ const EnableMfa = () => {
   const [showKey, setShowKey] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showBackupCodes, setShowBackupCodes] = useState(false);
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["mfa-setup"],
@@ -116,11 +119,20 @@ const EnableMfa = () => {
     mutate(data, {
       onSuccess: (response) => {
         console.log('MFA enable success response:', response);
+
+        // Extract backup codes from response
+        const codes = response?.data?.backupCodes || response?.data?.data?.backupCodes || [];
+
+        if (codes && codes.length > 0) {
+          setBackupCodes(codes);
+          setShowBackupCodes(true);
+        }
+
         refetch();
         setIsOpen(false);
         toast({
           title: "Success",
-          description: response.data.message,
+          description: response.data.message || "MFA has been enabled successfully",
         });
       },
       onError: (error: { message: string }) => {
@@ -325,6 +337,13 @@ const EnableMfa = () => {
           </Dialog>
         )}
       </div>
+
+      {/* Backup Codes Dialog */}
+      <BackupCodesDialog
+        isOpen={showBackupCodes}
+        onClose={() => setShowBackupCodes(false)}
+        backupCodes={backupCodes}
+      />
     </div>
   );
 };

@@ -31,6 +31,9 @@ interface LoginResponse {
         is2FAEnabled: boolean;
       };
       requires2FA?: boolean;
+      // For MFA flow
+      intermediateToken?: string;
+      // For non-MFA flow
       accessToken?: string;
       refreshToken?: string;
     }
@@ -84,18 +87,17 @@ export default function Login() {
           return;
         }
 
+
         // Check if MFA is required
         if (response.data.data.requires2FA || (response.data.data.user && response.data.data.user.is2FAEnabled)) {
-          console.log("2FA required, storing temporary tokens and redirecting to verification page");
-
-          // Store tokens temporarily in session storage (more secure than localStorage)
-          // This data will be cleared after MFA verification or when the session ends
-          sessionStorage.setItem(MFA_TEMP_STORAGE_KEY, JSON.stringify({
-            accessToken: response.data.data.accessToken,
-            refreshToken: response.data.data.refreshToken,
+          const tempAuthData = {
+            intermediateToken: response.data.data.intermediateToken,
             email: values.email,
-            timestamp: Date.now() // Add timestamp for potential expiry checks
-          }));
+            timestamp: Date.now()
+          };
+
+          // Store intermediate token temporarily in session storage
+          sessionStorage.setItem(MFA_TEMP_STORAGE_KEY, JSON.stringify(tempAuthData));
 
           // Redirect to MFA verification page
           router.push(`/verify-mfa?email=${values.email}`);
