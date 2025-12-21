@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import {
-  EllipsisIcon,
   Home,
   Loader,
   Lock,
@@ -23,18 +22,11 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/app/components/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/app/components/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/app/components/avatar";
 import { useAuthContext } from "@/context/auth-provider";
 import LogoutDialog from "@/app/(main)/components/LogoutDialog";
 
 const Asidebar = () => {
-  const { isLoading, user } = useAuthContext();
+  const { isLoading } = useAuthContext();
   const [isOpen, setIsOpen] = useState(false);
 
   const { open } = useSidebar();
@@ -103,39 +95,13 @@ const Asidebar = () => {
                   className="place-self-center self-center animate-spin"
                 />
               ) : (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton
-                      size="lg"
-                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                    >
-                      <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarFallback className="rounded-lg">
-                          {user?.name?.split(" ")?.[0]?.charAt(0)}
-                          {user?.name?.split(" ")?.[1]?.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">
-                          {user?.name}
-                        </span>
-                        <span className="truncate text-xs">{user?.email}</span>
-                      </div>
-                      <EllipsisIcon className="ml-auto size-4" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                    side={"bottom"}
-                    align="start"
-                    sideOffset={4}
-                  >
-                    <DropdownMenuItem onClick={() => setIsOpen(true)}>
-                      <LogOut />
-                      Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <SidebarMenuButton
+                  onClick={() => setIsOpen(true)}
+                  className="!text-[15px]"
+                >
+                  <LogOut />
+                  <span>Log out</span>
+                </SidebarMenuButton>
               )}
             </SidebarMenuItem>
           </SidebarMenu>
