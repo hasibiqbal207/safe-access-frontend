@@ -18,12 +18,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`bg-background ${dm_sans.className} antialiased`}>
+      <body className={`bg-background ${dm_sans.className} antialiased`} suppressHydrationWarning>
         <QueryProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="light"
-            enableSystem={false}
+            defaultTheme="system"
+            enableSystem={true}
             disableTransitionOnChange
           >
             {children}
