@@ -42,6 +42,45 @@ const clearAuthAndRedirect = () => {
   window.location.href = "/";
 };
 
+// REQUEST INTERCEPTOR - Attach access token to all requests
+API.interceptors.request.use(
+  (config) => {
+    // Skip adding token for public auth endpoints
+    const publicEndpoints = [
+      '/auth/login',
+      '/auth/register',
+      '/auth/verify-email',
+      '/auth/resend-verification',
+      '/auth/password/forgot',
+      '/auth/password/reset',
+      '/auth/mfa/verify-login'
+    ];
+
+    const isPublicEndpoint = publicEndpoints.some(endpoint =>
+      config.url?.includes(endpoint)
+    );
+
+    if (isPublicEndpoint) {
+      return config;
+    }
+
+    // Get access token from localStorage
+    const accessToken = typeof window !== 'undefined'
+      ? localStorage.getItem('accessToken')
+      : null;
+
+    if (accessToken) {
+      config.headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// RESPONSE INTERCEPTOR - Handle token refresh
 API.interceptors.response.use(
   (response) => {
     return response;
@@ -61,6 +100,9 @@ API.interceptors.response.use(
       data.errorCode === "AUTH_TOKEN_NOT_FOUND" ||
       data.errorCode === "TOKEN_EXPIRED" ||
       data.errorCode === "INVALID_TOKEN" ||
+      data.error?.code === "AUTH_REQUIRED" ||
+      data.error?.code === "TOKEN_EXPIRED" ||
+      data.error?.code === "INVALID_TOKEN" ||
       data.message?.toLowerCase().includes('token') ||
       data.message?.toLowerCase().includes('unauthorized')
     );
@@ -71,18 +113,14 @@ API.interceptors.response.use(
       if (isTokenError && originalRequest._retry) {
         clearAuthAndRedirect();
       }
-      return Promise.reject({
-        ...data,
-      });
+      return Promise.reject(data);
     }
 
     // Don't try to refresh on auth endpoints
     if (originalRequest.url?.includes('/auth/login') ||
       originalRequest.url?.includes('/auth/register') ||
       originalRequest.url?.includes('/auth/refresh')) {
-      return Promise.reject({
-        ...data,
-      });
+      return Promise.reject(data);
     }
 
     // Mark this request as a retry
@@ -106,30 +144,43 @@ API.interceptors.response.use(
     try {
       console.log('Access token expired, attempting to refresh...');
 
-      // Attempt to refresh the token
-      const response = await APIRefresh.get("/auth/refresh");
+      // Get refresh token from localStorage
+      const refreshToken = typeof window !== 'undefined'
+        ? localStorage.getItem('refreshToken')
+        : null;
+
+      if (!refreshToken) {
+        console.error('No refresh token found');
+        throw new Error('No refresh token available');
+      }
+
+      // POST /auth/refresh with refreshToken in body
+      // No Authorization header needed since backend middleware was removed
+      const response = await APIRefresh.post("/auth/refresh", { refreshToken });
 
       console.log('Token refresh successful');
 
       // Extract new tokens from response
-      const { accessToken, refreshToken } = response.data.data || response.data;
+      const newTokens = response.data.data || response.data;
+      const newAccessToken = newTokens.accessToken;
+      const newRefreshToken = newTokens.refreshToken;
 
       // Store new tokens in localStorage
-      if (typeof window !== 'undefined' && accessToken) {
-        localStorage.setItem('accessToken', accessToken);
-        if (refreshToken) {
-          localStorage.setItem('refreshToken', refreshToken);
+      if (typeof window !== 'undefined' && newAccessToken) {
+        localStorage.setItem('accessToken', newAccessToken);
+        if (newRefreshToken) {
+          localStorage.setItem('refreshToken', newRefreshToken);
         }
         console.log('New tokens stored in localStorage');
       }
 
       // Update the authorization header for the failed request
-      if (accessToken) {
-        originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+      if (newAccessToken) {
+        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
       }
 
       // Process queued requests
-      processQueue(null, accessToken);
+      processQueue(null, newAccessToken);
 
       isRefreshing = false;
 
