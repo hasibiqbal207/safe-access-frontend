@@ -50,8 +50,8 @@ const EnableMfa = () => {
   });
 
   // Extract data correctly, handling potential nesting in the API response
-  const mfaData = data && typeof data === 'object' && 'data' in data 
-    ? data.data as mfaType 
+  const mfaData = data && typeof data === 'object' && 'data' in data
+    ? data.data as mfaType
     : (data as mfaType) ?? ({} as mfaType);
 
   // Debug log for component
@@ -88,31 +88,31 @@ const EnableMfa = () => {
   // Ensure QR code URL is properly formatted as a data URL
   const sanitizedQrCodeUrl = useMemo(() => {
     if (!mfaData?.qrCodeUrl) return '';
-    
+
     // If it's already a properly formatted data URL, return as is
     if (mfaData.qrCodeUrl.startsWith('data:image/')) {
       return mfaData.qrCodeUrl;
     }
-    
+
     // If it's just the base64 content without the data URL prefix, add it
     if (mfaData.qrCodeUrl.startsWith('/9j/') || mfaData.qrCodeUrl.startsWith('iVBOR')) {
       return `data:image/png;base64,${mfaData.qrCodeUrl}`;
     }
-    
+
     return mfaData.qrCodeUrl;
   }, [mfaData.qrCodeUrl]);
 
   function onSubmit(values: z.infer<typeof FormSchema>) {
     console.log('Starting submit with values:', values);
     console.log('MFA data available:', mfaData);
-    
+
     // The backend only expects the token parameter
     const data = {
       token: values.pin,
     };
-    
+
     console.log('Sending data to enable MFA:', data);
-    
+
     mutate(data, {
       onSuccess: (response) => {
         console.log('MFA enable success response:', response);
@@ -141,7 +141,7 @@ const EnableMfa = () => {
 
   return (
     <div className="via-root to-root rounded-xl bg-gradient-to-r p-0.5">
-      <div className="rounded-[10px] p-6">
+      <div className="rounded-[10px]">
         <div className="flex items-center gap-3">
           <h3 className="text-xl tracking-[-0.16px] text-slate-12 font-bold mb-1">
             Multi-Factor Authentication (MFA)

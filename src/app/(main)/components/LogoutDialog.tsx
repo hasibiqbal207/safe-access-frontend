@@ -27,12 +27,12 @@ const LogoutDialog = (props: {
     onSuccess: () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      
+
       deleteCookie("accessToken");
       deleteCookie("refreshToken");
-      
+
       router.replace("/");
-      
+
       setTimeout(() => {
         if (window.location.pathname !== "/") {
           window.location.href = "/";
@@ -40,18 +40,55 @@ const LogoutDialog = (props: {
       }, 100);
     },
     onError: (error) => {
+      console.error('Logout API call failed:', error);
+
+      // Even if logout fails on backend, clear tokens locally and redirect
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      deleteCookie("accessToken");
+      deleteCookie("refreshToken");
+
       toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
+        title: "Logged out locally",
+        description: "Session cleared from this device",
+        variant: "default",
       });
+
+      router.replace("/");
+      setTimeout(() => {
+        if (window.location.pathname !== "/") {
+          window.location.href = "/";
+        }
+      }, 100);
     },
   });
 
   const handleLogout = useCallback(() => {
+    // Check if we have tokens
+    const hasAccessToken = typeof window !== 'undefined' && localStorage.getItem('accessToken');
+    const hasRefreshToken = typeof window !== 'undefined' && localStorage.getItem('refreshToken');
+
+    // If no tokens exist, just clear everything and redirect
+    if (!hasAccessToken && !hasRefreshToken) {
+      console.log('No tokens found, clearing storage and redirecting...');
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      deleteCookie("accessToken");
+      deleteCookie("refreshToken");
+      router.replace("/");
+      setTimeout(() => {
+        if (window.location.pathname !== "/") {
+          window.location.href = "/";
+        }
+      }, 100);
+      setIsOpen(false);
+      return;
+    }
+
+    // If we have tokens, try to logout via API
     mutate();
-  }, [mutate]);
-  
+  }, [mutate, router, setIsOpen]);
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

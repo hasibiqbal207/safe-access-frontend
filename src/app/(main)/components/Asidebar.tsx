@@ -6,6 +6,7 @@ import {
   Lock,
   LogOut,
   Settings,
+  Shield,
   User,
 } from "lucide-react";
 import Link from "next/link";
@@ -35,6 +36,11 @@ const Asidebar = () => {
       title: "Home",
       url: "/home",
       icon: Home,
+    },
+    {
+      title: "MFA",
+      url: "/mfa",
+      icon: Shield,
     },
     {
       title: "Sessions",
@@ -75,10 +81,10 @@ const Asidebar = () => {
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <a href={item.url} className="!text-[15px]">
+                      <Link href={item.url} className="!text-[15px]">
                         <item.icon />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
