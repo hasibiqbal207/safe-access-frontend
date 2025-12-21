@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Define protected routes (require authentication)
-const protectedRoutes = ["/home", "/sessions", "/mfa"];
+const protectedRoutes = ["/home", "/sessions", "/mfa", "/account"];
 
 // Define public routes (accessible without authentication)
 const publicRoutes = [

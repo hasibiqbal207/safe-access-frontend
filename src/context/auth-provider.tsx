@@ -1,15 +1,22 @@
 "use client";
 
 import useAuth from "@/hooks/use-auth";
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useMemo } from "react";
 
 type UserType = {
-  name: string;
+  _id: string;
+  firstName: string;
+  lastName: string;
+  name: string; // Computed field
   email: string;
-  isEmailVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  emailVerified: boolean;
+  isEmailVerified: boolean; // Normalized field
   is2FAEnabled: boolean;
+  role: string;
+  requirePasswordChange: boolean;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  passwordHistory: any[];
 };
 
 type AuthContextType = {
@@ -27,11 +34,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { data, error, isLoading, isFetching, refetch } = useAuth();
   console.log("Auth data:", data);
-  
-  // The profile API returns user data in data.data.user or directly in data.data
-  const user = data?.data?.data?.user || data?.data?.data;
-  console.log("Extracted user:", user);
-  
+
+  // Transform user data to match our interface
+  const user = useMemo(() => {
+    const rawUser = data?.data?.data?.user || data?.data?.data;
+
+    if (!rawUser) return undefined;
+
+    // Transform the data to include computed fields
+    return {
+      ...rawUser,
+      name: `${rawUser.firstName || ''} ${rawUser.lastName || ''}`.trim(),
+      isEmailVerified: rawUser.emailVerified ?? false,
+    } as UserType;
+  }, [data]);
+
+  console.log("Extracted and transformed user:", user);
+
   return (
     <AuthContext.Provider
       value={{ user, error, isLoading, isFetching, refetch }}
