@@ -6,9 +6,7 @@ import {
   Loader,
   Lock,
   LogOut,
-  MoonStarIcon,
   Settings,
-  SunIcon,
   User,
 } from "lucide-react";
 import Link from "next/link";
@@ -28,19 +26,14 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/app/components/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/app/components/avatar";
 import { useAuthContext } from "@/context/auth-provider";
 import LogoutDialog from "@/app/(main)/components/LogoutDialog";
-import { useTheme } from "next-themes";
 
 const Asidebar = () => {
-  const { theme, setTheme } = useTheme();
-
   const { isLoading, user } = useAuthContext();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -137,17 +130,6 @@ const Asidebar = () => {
                     align="start"
                     sideOffset={4}
                   >
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          setTheme(theme === "light" ? "dark" : "light")
-                        }
-                      >
-                        {theme === "light" ? <MoonStarIcon /> : <SunIcon />}
-                        Toggle theme
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setIsOpen(true)}>
                       <LogOut />
                       Log out

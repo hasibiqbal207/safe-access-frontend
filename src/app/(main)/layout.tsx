@@ -2,6 +2,7 @@ import { SidebarProvider, SidebarInset } from "@/app/components/sidebar";
 import Asidebar from "./components/Asidebar";
 import Header from "./components/Header";
 import { AuthProvider } from "@/context/auth-provider";
+import { ThemeToggle } from "@/app/components/theme-toggle";
 
 export default function MainLayout({
   children,
@@ -18,6 +19,7 @@ export default function MainLayout({
             {children}
           </main>
         </SidebarInset>
+        <ThemeToggle />
       </SidebarProvider>
     </AuthProvider>
   );
