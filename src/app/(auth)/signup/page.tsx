@@ -14,7 +14,7 @@ import {
 } from "@/app/components/form";
 import { Input } from "@/app/components/input";
 import { Button } from "@/app/components/button";
-import { ArrowRight, Loader, MailCheckIcon } from "lucide-react";
+import { ArrowRight, Loader, MailCheckIcon, Eye, EyeOff } from "lucide-react";
 
 import { useMutation } from "@tanstack/react-query";
 import { registerMutationFn } from "@/lib/api";
@@ -22,6 +22,8 @@ import { toast } from "@/hooks/use-toast";
 
 export default function SignUp() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { mutate, isPending } = useMutation({
     mutationFn: registerMutationFn,
@@ -29,8 +31,11 @@ export default function SignUp() {
 
   const formSchema = z
     .object({
-      name: z.string().trim().min(1, {
-        message: "Name is required",
+      firstName: z.string().trim().min(1, {
+        message: "First name is required",
+      }),
+      lastName: z.string().trim().min(1, {
+        message: "Last name is required",
       }),
       email: z.string().trim().email().min(1, {
         message: "Email is required",
@@ -50,7 +55,8 @@ export default function SignUp() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -93,14 +99,31 @@ export default function SignUp() {
                 <div className="mb-4">
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="firstName"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="dark:text-[#f1f7feb5] text-sm">
-                          Name
+                          First Name
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="Full Name" {...field} />
+                          <Input placeholder="John" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="mb-4">
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="dark:text-[#f1f7feb5] text-sm">
+                          Last Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Doe" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -138,12 +161,38 @@ export default function SignUp() {
                           Password
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="••••••••••••"
-                            {...field}
-                          />
+                          <div className="relative">
+                            <Input
+                              type={showPassword ? "text" : "password"}
+                              placeholder="••••••••••••"
+                              {...field}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                              aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
                         </FormControl>
+                        <div className="mt-2 space-y-1">
+                          <p className="text-xs text-muted-foreground dark:text-[#f1f7feb5]">
+                            Password must contain:
+                          </p>
+                          <ul className="text-xs text-muted-foreground dark:text-[#f1f7feb5] space-y-0.5 ml-4 list-disc">
+                            <li>At least 8 characters</li>
+                            <li>At least one uppercase letter</li>
+                            <li>At least one lowercase letter</li>
+                            <li>At least one number</li>
+                            <li>At least one special character (@$!%*?&)</li>
+                          </ul>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -160,11 +209,25 @@ export default function SignUp() {
                           Confirm Password
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="••••••••••••"
-                            {...field}
-                          />
+                          <div className="relative">
+                            <Input
+                              type={showConfirmPassword ? "text" : "password"}
+                              placeholder="••••••••••••"
+                              {...field}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                            >
+                              {showConfirmPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
