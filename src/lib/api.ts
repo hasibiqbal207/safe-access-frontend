@@ -25,6 +25,11 @@ type changeUserEmailType = {
   new_email: string;
 };
 
+type deleteUserType = {
+  userId: string;
+  password: string;
+};
+
 type verifyEmailType = { code: string };
 type enableMFAType = { token: string };
 type disableMFAType = { password: string };
@@ -167,6 +172,9 @@ export const updateUserMutationFn = async (data: updateUserType) =>
 export const changeUserEmailMutationFn = async (data: changeUserEmailType) =>
   await API.put(`/users/change-email`, data, { headers: getAuthHeaders() });
 
-export const deleteUserMutationFn = async (id: string) =>
-  await API.delete(`/users/delete/${id}`, { headers: getAuthHeaders() });
+export const deleteUserMutationFn = async (data: deleteUserType) =>
+  await API.delete(`/users/delete/${data.userId}`, {
+    headers: getAuthHeaders(),
+    data: { password: data.password }
+  });
 

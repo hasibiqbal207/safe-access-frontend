@@ -5,7 +5,6 @@ import {
   Loader,
   Lock,
   LogOut,
-  Settings,
   Shield,
   User,
 } from "lucide-react";
@@ -51,12 +50,6 @@ const Asidebar = () => {
       title: "Account",
       url: "/account",
       icon: User,
-    },
-
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
     },
   ];
   return (

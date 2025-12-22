@@ -6,7 +6,6 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogDescription,
     DialogFooter,
 } from "@/app/components/dialog";
 import { Input } from "@/app/components/input";
@@ -14,7 +13,7 @@ import { Label } from "@/app/components/label";
 import { toast } from "@/hooks/use-toast";
 import { deleteUserMutationFn } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
-import { Loader, AlertTriangle } from "lucide-react";
+import { Loader, AlertTriangle, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/context/auth-provider";
 import { deleteCookie } from "cookies-next";
@@ -27,6 +26,8 @@ const DeleteAccountDialog = (props: {
     const { user } = useAuthContext();
     const router = useRouter();
     const [confirmText, setConfirmText] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const { mutate, isPending } = useMutation({
         mutationFn: deleteUserMutationFn,
@@ -70,6 +71,15 @@ const DeleteAccountDialog = (props: {
             return;
         }
 
+        if (!password) {
+            toast({
+                title: "Error",
+                description: "Please enter your password",
+                variant: "destructive",
+            });
+            return;
+        }
+
         // We need the user ID - you might need to adjust this based on your API
         // For now, using a placeholder - update based on your user object structure
         const userId = (user as any)?._id || (user as any)?.id;
@@ -83,11 +93,13 @@ const DeleteAccountDialog = (props: {
             return;
         }
 
-        mutate(userId);
+        mutate({ userId, password });
     };
 
     const handleClose = () => {
         setConfirmText("");
+        setPassword("");
+        setShowPassword(false);
         setIsOpen(false);
     };
 
@@ -101,7 +113,7 @@ const DeleteAccountDialog = (props: {
                         </div>
                         <DialogTitle className="text-red-600 dark:text-red-400">Delete Account</DialogTitle>
                     </div>
-                    <DialogDescription className="text-left space-y-2">
+                    <div className="text-left space-y-2 text-sm text-muted-foreground">
                         <p className="font-semibold text-red-600 dark:text-red-400">
                             This action cannot be undone!
                         </p>
@@ -114,10 +126,33 @@ const DeleteAccountDialog = (props: {
                             <li>You will lose access to all features</li>
                             <li>This action is irreversible</li>
                         </ul>
-                    </DialogDescription>
+                    </div>
                 </DialogHeader>
 
                 <div className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="password" className="text-red-600 dark:text-red-400">
+                            Enter your password to confirm
+                        </Label>
+                        <div className="relative">
+                            <Input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter your password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="border-red-300 dark:border-red-800 focus:border-red-500 pr-10"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="space-y-2">
                         <Label htmlFor="confirmText" className="text-red-600 dark:text-red-400">
                             Type <span className="font-bold">DELETE</span> to confirm
@@ -145,7 +180,7 @@ const DeleteAccountDialog = (props: {
                     <Button
                         type="button"
                         onClick={handleDelete}
-                        disabled={isPending || confirmText !== "DELETE"}
+                        disabled={isPending || confirmText !== "DELETE" || !password}
                         className="bg-red-600 hover:bg-red-700 !text-white"
                     >
                         {isPending && <Loader className="animate-spin mr-2" size={16} />}
