@@ -31,7 +31,7 @@ type deleteUserType = {
   password: string;
 };
 
-type verifyEmailType = { code: string };
+type verifyEmailType = { verification_token: string };
 type enableMFAType = { token: string };
 type disableMFAType = { password: string };
 type mfaLoginType = { token: string };
