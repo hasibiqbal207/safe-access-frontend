@@ -239,38 +239,17 @@ export default function Login() {
               Sign in
               <ArrowRight />
             </Button>
-
-            <div className="mb-6 mt-6 flex items-center justify-center">
-              <div
-                aria-hidden="true"
-                className="h-px w-full bg-[#eee] dark:bg-[#d6ebfd30]"
-                data-orientation="horizontal"
-                role="separator"
-              ></div>
-              <span className="mx-4 text-xs text-gray-700 dark:text-[#f1f7feb5] font-normal">
-                OR
-              </span>
-              <div
-                aria-hidden="true"
-                className="h-px w-full bg-[#eee] dark:bg-[#d6ebfd30]"
-                data-orientation="horizontal"
-                role="separator"
-              ></div>
-            </div>
           </form>
         </Form>
-        <Button className="w-full h-[40px] variant='outline' ">
-          Email magic link
-        </Button>
         <p className="text-xs text-gray-600 dark:text-slate-400 font-normal mt-7">
           By signing in, you agree to our{" "}
-          <a className="text-primary hover:underline" href="#">
+          <Link className="text-primary hover:underline" href="/terms-of-service">
             Terms of Service
-          </a>{" "}
+          </Link>{" "}
           and{" "}
-          <a className="text-primary hover:underline" href="#">
+          <Link className="text-primary hover:underline" href="/privacy-policy">
             Privacy Policy
-          </a>
+          </Link>
           .
         </p>
       </div>

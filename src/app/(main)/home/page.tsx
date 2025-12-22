@@ -2,13 +2,16 @@
 import React from "react";
 import Link from "next/link";
 import { Shield, Lock } from "lucide-react";
+import { useAuthContext } from "@/context/auth-provider";
 
 const Home = () => {
+  const { user } = useAuthContext();
+
   return (
     <div>
       <div className="flex max-w-3xl flex-col gap-2 mx-auto w-full md:max-w-5xl px-6 py-8">
         <h1 className="text-[28px] leading-[34px] tracking-[-0.416px] text-[#000509e3] dark:text-inherit font-extrabold">
-          Welcome to Safe Access
+          Welcome{user?.firstName ? `, ${user.firstName}` : " to Safe Access"}
         </h1>
         <p className="text-sm text-[#0007149f] dark:text-gray-100 font-normal">
           Manage your account security and active sessions from one place.
