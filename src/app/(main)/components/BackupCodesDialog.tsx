@@ -195,7 +195,7 @@ const BackupCodesDialog: React.FC<BackupCodesDialogProps> = ({
                             </h4>
                             <ul className="text-xs text-amber-800 dark:text-amber-200 space-y-1">
                                 <li>• Each code can only be used once</li>
-                                <li>• You won't be able to see these codes again</li>
+                                <li>• You won&apos;t be able to see these codes again</li>
                                 <li>• Store them in a password manager or secure location</li>
                             </ul>
                         </div>
@@ -269,7 +269,7 @@ const BackupCodesDialog: React.FC<BackupCodesDialogProps> = ({
                         onClick={handleConfirmClose}
                         className="w-full h-11 bg-green-600 hover:bg-green-700 text-white"
                     >
-                        I've Saved My Backup Codes
+                        I&apos;ve Saved My Backup Codes
                     </Button>
                 </div>
             </DialogContent>

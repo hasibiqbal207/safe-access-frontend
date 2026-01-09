@@ -26,7 +26,7 @@ const AccountPage = () => {
             });
             refetch(); // Refresh user data
         },
-        onError: (error: any) => {
+        onError: (error: { message?: string }) => {
             toast({
                 title: "Error",
                 description: error.message || "Failed to send verification email",

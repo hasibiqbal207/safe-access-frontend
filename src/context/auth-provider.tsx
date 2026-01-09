@@ -16,7 +16,7 @@ type UserType = {
   requirePasswordChange: boolean;
   createdAt: string | Date;
   updatedAt: string | Date;
-  passwordHistory: any[];
+  passwordHistory: unknown[];
 };
 
 type AuthContextType = {

@@ -51,7 +51,7 @@ const ChangePasswordDialog = (props: {
             reset();
             setIsOpen(false);
         },
-        onError: (error: any) => {
+        onError: (error: { code?: string; message?: string }) => {
             // Check if it's a compromised password error
             const isCompromisedPassword =
                 error?.code === "COMPROMISED_PASSWORD" ||

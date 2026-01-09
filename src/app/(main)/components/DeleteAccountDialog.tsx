@@ -52,7 +52,7 @@ const DeleteAccountDialog = (props: {
                 }
             }, 100);
         },
-        onError: (error: any) => {
+        onError: (error: { message?: string }) => {
             toast({
                 title: "Error",
                 description: error.message || "Failed to delete account",
@@ -82,7 +82,7 @@ const DeleteAccountDialog = (props: {
 
         // We need the user ID - you might need to adjust this based on your API
         // For now, using a placeholder - update based on your user object structure
-        const userId = (user as any)?._id || (user as any)?.id;
+        const userId = (user as { _id?: string; id?: string })?._id || (user as { _id?: string; id?: string })?.id;
 
         if (!userId) {
             toast({

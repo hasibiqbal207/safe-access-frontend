@@ -29,7 +29,7 @@ export default function TermsOfService() {
                             1. Acceptance of Terms
                         </h2>
                         <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                            By accessing and using SafeAccess ("the Service"), you accept and
+                            By accessing and using SafeAccess (&quot;the Service&quot;), you accept and
                             agree to be bound by the terms and provision of this agreement.
                             If you do not agree to abide by the above, please do not use this
                             service.
@@ -60,7 +60,7 @@ export default function TermsOfService() {
                                 materials
                             </li>
                             <li>
-                                Transfer the materials to another person or "mirror" the
+                                Transfer the materials to another person or &quot;mirror&quot; the
                                 materials on any other server
                             </li>
                         </ul>
@@ -191,7 +191,7 @@ export default function TermsOfService() {
                         </h2>
                         <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                             We reserve the right to modify or replace these Terms at any time.
-                            If a revision is material, we will try to provide at least 30 days'
+                            If a revision is material, we will try to provide at least 30 days&apos;
                             notice prior to any new terms taking effect. What constitutes a
                             material change will be determined at our sole discretion.
                         </p>

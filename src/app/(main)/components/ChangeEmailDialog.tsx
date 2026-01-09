@@ -48,7 +48,7 @@ const ChangeEmailDialog = (props: {
             // Refetch user data to update the UI
             refetch();
         },
-        onError: (error: any) => {
+        onError: (error: { message?: string }) => {
             toast({
                 title: "Error",
                 description: error.message || "Failed to change email",

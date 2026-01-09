@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+export const dynamic = 'force-dynamic';
+
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/app/components/button";
@@ -9,14 +11,14 @@ import Link from "next/link";
 import { verifyEmailMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
-export default function VerifyEmail() {
+function VerifyEmailContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
     const [verificationStatus, setVerificationStatus] = useState<"pending" | "success" | "error">("pending");
     const [errorMessage, setErrorMessage] = useState<string>("");
 
-    const { mutate, isPending } = useMutation({
+    const { mutate } = useMutation({
         mutationFn: verifyEmailMutationFn,
         onSuccess: () => {
             setVerificationStatus("success");
@@ -29,7 +31,7 @@ export default function VerifyEmail() {
                 router.push("/");
             }, 3000);
         },
-        onError: (error: any) => {
+        onError: (error: { response?: { data?: { message?: string } }; message?: string }) => {
             const errorMsg = error?.response?.data?.message || error.message || "Invalid or expired verification token";
             setErrorMessage(errorMsg);
             setVerificationStatus("error");
@@ -48,7 +50,7 @@ export default function VerifyEmail() {
         } else {
             setVerificationStatus("error");
         }
-    }, [token]);
+    }, [token, mutate]);
 
     return (
         <main className="w-full min-h-[590px] h-full max-w-full flex items-center justify-center">
@@ -102,5 +104,22 @@ export default function VerifyEmail() {
                 )}
             </div>
         </main>
+    );
+}
+
+export default function VerifyEmail() {
+    return (
+        <Suspense fallback={
+            <main className="w-full min-h-[590px] h-full max-w-full flex items-center justify-center">
+                <div className="w-full h-full p-5 rounded-md flex flex-col items-center justify-center gap-4">
+                    <Loader className="animate-spin size-12 text-primary" />
+                    <h1 className="text-xl tracking-[-0.16px] dark:text-[#fcfdffef] font-bold text-center">
+                        Loading...
+                    </h1>
+                </div>
+            </main>
+        }>
+            <VerifyEmailContent />
+        </Suspense>
     );
 }

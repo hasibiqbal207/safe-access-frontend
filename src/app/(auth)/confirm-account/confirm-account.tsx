@@ -27,7 +27,7 @@ export default function ConfirmAccount() {
       return;
     }
     mutate(
-      { code },
+      { verification_token: code },
 
       {
         onSuccess: () => {

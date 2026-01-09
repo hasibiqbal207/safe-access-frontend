@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
                             1. Introduction
                         </h2>
                         <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                            SafeAccess ("we", "our", or "us") is committed to protecting your
+                            SafeAccess (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your
                             privacy. This Privacy Policy explains how we collect, use,
                             disclose, and safeguard your information when you use our service.
                             Please read this privacy policy carefully. If you do not agree with
@@ -244,7 +244,7 @@ export default function PrivacyPolicy() {
 
                     <section>
                         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                            9. Children's Privacy
+                            9. Children&apos;s Privacy
                         </h2>
                         <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                             Our service is not intended for children under the age of 13. We do
@@ -275,7 +275,7 @@ export default function PrivacyPolicy() {
                         <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                             We may update our Privacy Policy from time to time. We will notify
                             you of any changes by posting the new Privacy Policy on this page
-                            and updating the "Last Updated" date. You are advised to review
+                            and updating the &quot;Last Updated&quot; date. You are advised to review
                             this Privacy Policy periodically for any changes. Changes to this
                             Privacy Policy are effective when they are posted on this page.
                         </p>
